@@ -345,7 +345,8 @@
       seen[ny][nx] = true; stack.push([nx, ny]);
     }
     player = { x: 0, y: 0 }; goal = { x: cols - 1, y: rows - 1 }; trail = [{ x: 0, y: 0 }];
-    placeKeys(Math.min(level, 3));
+    // Rätsel pro Level: 3, 5, dann 6 und langsam bis 8
+    placeKeys(level === 1 ? 3 : level === 2 ? 5 : Math.min(6 + Math.floor((level - 3) / 2), 8));
     $('level').textContent = 'Level ' + level;
     resize();
   }
@@ -361,17 +362,21 @@
       cand.push({ x, y, dead: open === 1 });
     }
     const ordered = shuffle(cand.filter(c => c.dead)).concat(shuffle(cand.filter(c => !c.dead)));
-    for (const c of ordered) {
+    // möglichst weit verteilt; wenn's eng wird, dürfen Schlüssel näher zusammen liegen
+    for (const minDist of [4, 3, 2, 1]) {
+      for (const c of ordered) {
+        if (keys.length >= n) break;
+        if (keys.some(k => k.x === c.x && k.y === c.y)) continue;
+        if (keys.every(k => Math.abs(k.x - c.x) + Math.abs(k.y - c.y) >= minDist)) keys.push({ x: c.x, y: c.y });
+      }
       if (keys.length >= n) break;
-      if (keys.every(k => Math.abs(k.x - c.x) + Math.abs(k.y - c.y) >= 4)) keys.push({ x: c.x, y: c.y });
     }
+    keysTotal = keys.length;
     renderKeys();
   }
   function renderKeys() {
     const found = keysTotal - keys.length;
-    let h = '';
-    for (let i = 0; i < keysTotal; i++) h += i < found ? '🔑' : '<span class="gone">🔑</span>';
-    $('keys').innerHTML = h;
+    $('keys').innerHTML = `🔑 <b>${found}</b>/${keysTotal}`;
   }
 
   function resize() {
