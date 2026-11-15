@@ -11,7 +11,7 @@ M.register('bakery', {
       <div class="customer"><div class="who" id="bWho"></div><div class="bubbletalk" id="bTalk"></div></div>
       <div class="mini-house"><div class="roof" id="bRoof" style="width:150px;height:60px;font-size:1.8rem"></div><div class="floor" style="width:120px"><span id="bHave" style="height:48px;font-size:1.8rem"></span><span class="q" id="bNeed" style="height:48px;font-size:1.8rem">?</span></div></div>
       <div class="plate" id="bPlate"></div>
-      <div class="shop-btns"><button class="btn pink" id="bAdd"></button><button class="btn green" id="bBell">🔔 Fertig</button></div>
+      <div class="shop-btns"><button class="btn" id="bSub"></button><button class="btn pink" id="bAdd"></button><button class="btn green" id="bBell">🔔 Fertig</button></div>
     </div>`;
     const $s = sel => stage.querySelector(sel);
     const hud = () => M.setHud(`🧁 ${served}/${goal}`);
@@ -34,10 +34,16 @@ M.register('bakery', {
       $s('#bTalk').innerHTML = `Ich möchte <b>${T}</b> ${order.treat[0]}!`;
       $s('#bRoof').textContent = T;
       $s('#bAdd').textContent = '+ ' + order.treat[0];
+      $s('#bSub').textContent = '− ' + order.treat[0];
       render();
       M.say(`Hallo! Ich möchte ${T} ${order.treat[1]}. ${start ? start + ' sind schon auf dem Teller.' : 'Der Teller ist noch leer.'} Leg dazu, was fehlt!`);
     }
     $s('#bAdd').onclick = () => { if (!alive || wait) return; if (onPlate >= 12) { M.boop(); return; } onPlate++; M.plop(); render(); M.say(String(onPlate), 1.1); };
+    $s('#bSub').onclick = () => {
+      if (!alive || wait) return;
+      if (onPlate <= order.start) { M.boop(); M.wiggle($s('#bSub')); M.say(order.start ? 'Die waren schon da. Die bleiben!' : 'Der Teller ist schon leer!'); return; }
+      onPlate--; M.blip(); render(); M.say(String(onPlate), 1.1);
+    };
     $s('#bBell').onclick = () => {
       if (!alive || wait) return;
       M.tone(1568, 0, .5, 'sine', .15);
