@@ -249,7 +249,7 @@
   const pick = a => a[rnd(a.length)];
   const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
-  let animal = '🦄', level = 1;
+  let animal = '🦄', level = 1, finished = false;
   let cols, rows, walls, player, goal, trail, cell, keys = [], keysTotal = 0;
   let busy = false;
 
@@ -261,6 +261,8 @@
   let treasures = parseInt(store.get('maresaSchaetze', '0'), 10) || 0;
   let riddles = parseInt(store.get('maresaRaetsel', '0'), 10) || 0;
   let mode = store.get('maresaModus', 'both');
+  animal = store.get('maresaTier', '🦄');
+  level = Math.max(1, parseInt(store.get('maresaLevel', '1'), 10) || 1);
   function showStats() {
     $('treasureCount').textContent = '💰 ' + treasures + (treasures === 1 ? ' Schatz' : ' Schätze');
     $('riddleCount').textContent = '🔑 ' + riddles + ' Rätsel';
@@ -285,10 +287,12 @@
     } catch (e) {}
   }
   try { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; } catch (e) {}
+  // So soll die Stimme den Namen aussprechen (Lautschrift für die Sprachausgabe)
+  const NAME_SPOKEN = 'Maresa';
   function say(text, rate = 0.9) {
     try {
       speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
+      const u = new SpeechSynthesisUtterance(String(text).replace(/Maresa/g, NAME_SPOKEN));
       u.lang = 'de-DE'; u.rate = rate; u.pitch = 1.1;
       if (voice) u.voice = voice;
       speechSynthesis.speak(u);
@@ -642,7 +646,7 @@
     'So schlau! So mutig! So Maresa! ✨', 'Buchstaben-Detektivin! 🔍', 'Mega-Giga-Super! 🚀'
   ];
   function party() {
-    busy = true;
+    busy = true; finished = true;
     treasures++; store.set('maresaSchaetze', treasures); showStats();
     const p = $('party');
     $('partyPet').textContent = animal === 'ME' ? '🌟' : animal;
@@ -680,8 +684,14 @@
 
   // ---------- Steuerung ----------
   document.querySelectorAll('.animal').forEach(b => b.addEventListener('click', () => {
-    animal = b.dataset.a; level = 1; audio(); busy = false; show('game'); generate();
-    say(level === 1 ? 'Such den Schlüssel und dann den Schatz!' : '');
+    animal = b.dataset.a; store.set('maresaTier', animal); audio(); busy = false;
+    show('game');
+    // Tierwechsel: das Labyrinth bleibt, wie es ist – nur nach einem gefundenen Schatz geht's ins nächste Level
+    if (!walls || finished) {
+      if (finished) { level++; finished = false; store.set('maresaLevel', level); }
+      generate();
+      say('Such die Schlüssel und dann den Schatz!');
+    } else resize();
   }));
   document.querySelectorAll('.pad button').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); move(+b.dataset.d); }));
   window.addEventListener('keydown', e => {
@@ -700,7 +710,7 @@
   });
   $('back').onclick = () => { busy = false; show('start'); };
   $('newmaze').onclick = () => { if (!busy) generate(); };
-  $('next').onclick = () => { endParty(); level++; generate(); };
+  $('next').onclick = () => { endParty(); level++; finished = false; store.set('maresaLevel', level); generate(); };
   $('other').onclick = () => { endParty(); show('start'); };
   window.addEventListener('resize', () => { if (walls) resize(); sizeFx(); });
 })();
