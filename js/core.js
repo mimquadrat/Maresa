@@ -9,8 +9,10 @@
 
   // ---------- Speicher ----------
   const store = M.store = {
-    get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch (e) { return d; } },
-    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+    // Spielstand-Schlüssel „maresa…“ gehören zum aktiven Spieler; Maresa behält ihre alten Schlüssel
+    key(k) { return (k.startsWith('maresa') && M.player && M.player.id !== 'maresa') ? 'sp_' + M.player.id + '_' + k.slice(6) : k; },
+    get(k, d) { try { const v = localStorage.getItem(this.key(k)); return v === null ? d : v; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(this.key(k), v); } catch (e) {} },
     num(k, d = 0) { return parseInt(this.get(k, String(d)), 10) || d; }
   };
   M.animal = store.get('maresaTier', '🦄');
@@ -31,7 +33,7 @@
     try {
       speechSynthesis.cancel();
       if (!text) return;
-      const u = new SpeechSynthesisUtterance(String(text).replace(/Maresa/g, NAME_SPOKEN));
+      const u = new SpeechSynthesisUtterance(String(text).replace(/Maresas/g, NAME_SPOKEN + 's').replace(/Maresa/g, NAME_SPOKEN));
       u.lang = 'de-DE'; u.rate = rate; u.pitch = 1.1;
       if (voice) u.voice = voice;
       speechSynthesis.speak(u);
@@ -80,14 +82,18 @@
     }
   };
   M.wiggle = el => { el.classList.remove('wrong'); void el.offsetWidth; el.classList.add('wrong'); setTimeout(() => el.classList.remove('wrong'), 450); };
-  M.PRAISE = ['Super!', 'Richtig!', 'Toll gemacht!', 'Bravo, Maresa!', 'Klasse!', 'Genau!', 'Spitze!', 'Wow!'];
+  M.PRAISE = ['Super!', 'Richtig!', 'Toll gemacht!', 'Bravo, Maresa!', 'Klasse!', 'Genau!', 'Spitze!', 'Wow!'];  // wird pro Spieler neu gesetzt
 
   // Tier (oder Maresas Foto) als HTML
-  M.petHTML = (size = 40) => M.animal === 'ME' ? `<img src="${M.face}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;border:3px solid var(--accent2)" alt="">` : M.animal;
+  M.avatarHTML = (size = 40) => M.face
+    ? `<img class="av-photo" src="${M.face}" style="width:${size}px;height:${size}px" alt="">`
+    : `<span class="av-emoji" style="width:${size}px;height:${size}px;font-size:${Math.round(size * .62)}px">${M.player ? M.player.fig : '🙂'}</span>`;
+  M.petHTML = (size = 40) => M.animal === 'ME' ? M.avatarHTML(size) : M.animal;
   const faceImg = new Image(); faceImg.src = M.face; M.faceImg = faceImg;
   M.drawPet = (ctx, cx, cy, size) => {
     ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#000';
-    if (M.animal === 'ME') {
+    if (M.animal === 'ME' && !M.face) { ctx.font = Math.floor(size) + 'px sans-serif'; ctx.fillText(M.player.fig, cx, cy + size * 0.05); }
+    else if (M.animal === 'ME') {
       const r = size * 0.5;
       ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.closePath(); ctx.save(); ctx.clip();
       if (faceImg.complete) ctx.drawImage(faceImg, cx - r, cy - r, r * 2, r * 2);
@@ -244,6 +250,90 @@
   }
   M.show = show;
 
+  // ---------- Spieler ----------
+  const BUILTIN = [
+    { id: 'maresa', name: 'Maresa', fig: '👧', g: 'f', photo: 'img/maresa.jpg' },
+    { id: 'baumgartner', name: 'Frau Baumgartner', fig: '👩‍🏫', g: 'f' }
+  ];
+  const custom = () => { try { return JSON.parse(localStorage.getItem('spielerListe') || '[]'); } catch (e) { return []; } };
+  const saveCustom = l => { try { localStorage.setItem('spielerListe', JSON.stringify(l)); } catch (e) {} };
+  const genitive = n => /[sßxz]$/i.test(n) ? n + '’' : n + 's';
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  function loadPlayer(p) {
+    M.player = p; M.name = p.name; M.face = p.photo || null;
+    if (M.face) faceImg.src = M.face;
+    M.animal = store.get('maresaTier', '🦄');
+    M.mode = store.get('maresaModus', 'both');
+    M.progress = store.num('maresaStation', 0);
+    M.PRAISE = ['Super!', 'Richtig!', 'Toll gemacht!', 'Bravo, ' + p.name + '!', 'Klasse!', 'Genau!', 'Spitze!', 'Wow!'];
+    document.querySelectorAll('.avslot').forEach(s => s.innerHTML = M.avatarHTML(+s.dataset.size || 40));
+    document.querySelectorAll('.pname').forEach(s => s.textContent = p.name);
+    document.querySelectorAll('.pgen').forEach(s => s.textContent = genitive(p.name) + ' Spielewelt');
+    document.title = genitive(p.name) + ' Spielewelt';
+    document.querySelectorAll('.mode').forEach(b => b.classList.toggle('on', b.dataset.m === M.mode));
+    document.querySelectorAll('.animal').forEach(b => b.classList.toggle('on', b.dataset.a === M.animal));
+    showStats();
+  }
+  function playerStats(p) {
+    const k = p.id === 'maresa' ? 'maresaStation' : 'sp_' + p.id + '_Station';
+    let n = 0; try { n = parseInt(localStorage.getItem(k) || '0', 10) || 0; } catch (e) {}
+    return n ? 'Station ' + (n + 1) : 'Neu dabei';
+  }
+  function renderPlayers() {
+    const list = $('plist'); list.innerHTML = '';
+    const all = BUILTIN.concat(custom());
+    all.forEach(p => {
+      const c = document.createElement('div'); c.className = 'pcard'; c.setAttribute('role', 'button');
+      const av = p.photo ? `<img class="av-photo" src="${p.photo}" style="width:84px;height:84px" alt="">`
+        : `<span class="av-emoji" style="width:84px;height:84px;font-size:52px">${p.fig}</span>`;
+      c.innerHTML = av + `<div class="nm">${esc(p.name)}</div><div class="st">${playerStats(p)}</div>` + (p.builtin === false ? '<button class="pdel" aria-label="Spieler löschen">✕</button>' : '');
+      c.onclick = e => {
+        if (e.target.closest('.pdel') || e.target.closest('.pconfirm')) return;
+        M.audio(); loadPlayer(p); show('start'); M.say('Hallo ' + p.name + '! Wer willst du heute sein?');
+      };
+      const del = c.querySelector('.pdel');
+      if (del) del.onclick = () => {
+        const box = document.createElement('div'); box.className = 'pconfirm';
+        box.innerHTML = `${esc(p.name)} löschen?<div><button class="no">Nein</button><button class="yes" style="background:#ffd6d6">Ja, löschen</button></div>`;
+        box.querySelector('.no').onclick = () => box.remove();
+        box.querySelector('.yes').onclick = () => {
+          saveCustom(custom().filter(x => x.id !== p.id));
+          try { Object.keys(localStorage).filter(k => k.startsWith('sp_' + p.id + '_')).forEach(k => localStorage.removeItem(k)); } catch (e) {}
+          renderPlayers();
+        };
+        c.appendChild(box);
+      };
+      list.appendChild(c);
+    });
+    const add = document.createElement('button'); add.className = 'pcard add';
+    add.innerHTML = '<div class="plus">➕</div><div class="nm">Neuer Spieler</div>';
+    add.onclick = () => { M.audio(); openNewPlayer(); };
+    list.appendChild(add);
+  }
+  let newFig = null;
+  function openNewPlayer() {
+    newFig = null; $('npName').value = '';
+    document.querySelectorAll('.fig').forEach(f => f.classList.remove('on'));
+    checkNew(); show('newPlayer'); M.say('Wie heißt du? Und wer willst du sein?');
+  }
+  function checkNew() { $('npGo').disabled = !($('npName').value.trim() && newFig); }
+  $('npName').addEventListener('input', checkNew);
+  document.querySelectorAll('.fig').forEach(f => f.onclick = () => {
+    newFig = { fig: f.dataset.f, g: f.dataset.g };
+    document.querySelectorAll('.fig').forEach(x => x.classList.toggle('on', x === f)); M.blip(); checkNew();
+  });
+  $('npBack').onclick = () => { renderPlayers(); show('players'); };
+  $('npGo').onclick = () => {
+    const name = $('npName').value.trim().slice(0, 20); if (!name || !newFig) return;
+    const p = { id: 'p' + Date.now().toString(36), name, fig: newFig.fig, g: newFig.g, builtin: false };
+    saveCustom(custom().concat([p]));
+    loadPlayer(p); show('start'); M.ding(); M.say('Hallo ' + name + '! Schön, dass du da bist! Such dir ein Tier aus!');
+  };
+  $('swapPlayer').onclick = () => { leaveGame(); renderPlayers(); show('players'); };
+  loadPlayer(BUILTIN[0]);
+  renderPlayers();
+
   // ---------- Startbildschirm ----------
   showStats();
   document.querySelectorAll('.mode').forEach(b => {
@@ -298,7 +388,7 @@
     });
     $('mapStation').textContent = 'Station ' + (M.progress + 1);
     requestAnimationFrame(() => { $('mapScroll').scrollTop = Math.max(0, cur.y - $('mapScroll').clientHeight / 2); });
-    if (greet) M.say(M.progress === 0 ? 'Hallo Maresa! Tipp auf die erste Station!' : 'Weiter geht\'s! Tipp auf die leuchtende Station!');
+    if (greet) M.say(M.progress === 0 ? 'Hallo ' + M.name + '! Tipp auf die erste Station!' : 'Weiter geht\'s! Tipp auf die leuchtende Station!');
   }
   M.openMap = openMap;
   $('mapHome').onclick = () => { leaveGame(); show('start'); };
@@ -377,11 +467,14 @@
   }
 
   // ---------- DIE PARTY ----------
-  const praises = [
-    'Maresa, die Königin! 👑', 'WAHNSINN, MARESA!!! 🤩', 'Du bist die Allerbeste! 💖',
-    'Rechen-Profi Maresa! 🔢', 'Super-Maresa hat\'s geschafft! 🦸‍♀️', 'Weltmeisterin! 🏆',
-    'So schlau! So mutig! So Maresa! ✨', 'Buchstaben-Detektivin! 🔍', 'Mega-Giga-Super! 🚀'
-  ];
+  const praises = () => {
+    const N = M.name, f = M.player.g === 'f';
+    return [
+      f ? `${N}, die Königin! 👑` : `${N}, der König! 👑`, `WAHNSINN, ${N.toUpperCase()}!!! 🤩`, f ? 'Du bist die Allerbeste! 💖' : 'Du bist der Allerbeste! 💖',
+      `Rechen-Profi ${N}! 🔢`, `Super-${N} hat's geschafft! ${f ? '🦸‍♀️' : '🦸‍♂️'}`, f ? 'Weltmeisterin! 🏆' : 'Weltmeister! 🏆',
+      `So schlau! So mutig! So ${N}! ✨`, f ? 'Buchstaben-Detektivin! 🔍' : 'Buchstaben-Detektiv! 🔍', 'Mega-Giga-Super! 🚀'
+    ];
+  };
   let partyTimer = null;
   function win() {
     const s = current.station;
@@ -391,10 +484,10 @@
     if (s === M.progress) { M.progress++; store.set('maresaStation', M.progress); }
     const p = $('party');
     $('partyPet').textContent = M.animal === 'ME' ? '🌟' : M.animal;
-    const text = islandDone ? '🏝️ INSEL GESCHAFFT! 🏝️' : '🎉 GESCHAFFT, MARESA! 🎉';
+    const text = islandDone ? '🏝️ INSEL GESCHAFFT! 🏝️' : '🎉 GESCHAFFT, ' + M.name.toUpperCase() + '! 🎉';
     const colors = ['#fff', '#fff34f', '#ffffff', '#ffe3f3'];
     $('headline').innerHTML = [...text].map((ch, i) => ch === ' ' ? ' ' : `<span style="animation-delay:${(i * 0.05).toFixed(2)}s;color:${colors[i % colors.length]}">${ch}</span>`).join('');
-    const pr = pick(praises);
+    const pr = pick(praises());
     $('praise').textContent = pr;
     $('partyCount').textContent = g.icon + ' ' + g.name + ' geschafft!  ⭐ ' + store.num('maresaRaetsel') + ' Aufgaben gelöst';
     p.classList.add('active');
@@ -402,7 +495,7 @@
     const box = p.querySelector('.partybox'); box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
     M.vibrate([100, 50, 100, 50, 200, 100, 400]);
     M.fanfare();
-    setTimeout(() => M.say((islandDone ? 'Wahnsinn! Die ganze Insel geschafft! ' : 'Maresa hat es geschafft! ') + pr.replace(/[^\p{L}\p{N}\s!,'’]/gu, ''), 1), 2600);
+    setTimeout(() => M.say((islandDone ? 'Wahnsinn! Die ganze Insel geschafft! ' : M.name + ' hat es geschafft! ') + pr.replace(/[^\p{L}\p{N}\s!,'’]/gu, ''), 1), 2600);
     sizeFx(); running = true; loop();
     confetti(islandDone ? 350 : 200); emojiRain(islandDone ? 100 : 60);
     let shots = 0;

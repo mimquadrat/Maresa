@@ -10,14 +10,37 @@
 <link rel="apple-touch-icon" href="img/maresa.jpg">
 <link rel="icon" href="img/maresa.jpg">
 <title>Maresas Spielewelt</title>
-<link rel="stylesheet" href="css/style.css?v=5">
+<link rel="stylesheet" href="css/style.css?v=6">
 </head>
 <body>
 
-<div id="start" class="screen active">
-  <div class="hero"><div class="crown">👑</div><img src="img/maresa.jpg" alt="Maresa"></div>
-  <h1>Maresas Spielewelt</h1>
-  <p>Hallo Maresa! 👋 Wer willst du heute sein?</p>
+<div id="players" class="screen active">
+  <div style="font-size:2.6rem">🌈🎮✨</div>
+  <h1 class="ptitle">Wer spielt heute?</h1>
+  <div class="plist" id="plist"></div>
+</div>
+
+<div id="newPlayer" class="screen">
+  <div class="bar"><button class="btn" id="npBack">◀</button><div class="mid"><span>Neuer Spieler</span></div><div></div></div>
+  <div class="npbox">
+    <label for="npName" class="nplabel">Wie heißt du?</label>
+    <input id="npName" class="npinput" maxlength="20" autocomplete="off" placeholder="Name eintippen">
+    <div class="nplabel">Wer willst du sein?</div>
+    <div class="figs" id="figs">
+      <button class="fig" data-f="👧" data-g="f">👧<span>Mädchen</span></button>
+      <button class="fig" data-f="👦" data-g="m">👦<span>Junge</span></button>
+      <button class="fig" data-f="👸" data-g="f">👸<span>Prinzessin</span></button>
+      <button class="fig" data-f="🦸‍♂️" data-g="m">🦸‍♂️<span>Superheld</span></button>
+    </div>
+    <button class="btn pink npgo" id="npGo" disabled>Los geht's! ▶</button>
+  </div>
+</div>
+
+<div id="start" class="screen">
+  <button class="btn swap" id="swapPlayer">👥 Spieler</button>
+  <div class="hero"><div class="crown">👑</div><span class="avslot" data-size="130"></span></div>
+  <h1 class="pgen">Maresas Spielewelt</h1>
+  <p>Hallo <span class="pname">Maresa</span>! 👋 Wer willst du heute sein?</p>
   <div class="stats"><div id="treasureCount">💰 0 Schätze</div><div id="riddleCount">⭐ 0 Aufgaben</div></div>
   <div class="modes">
     <button class="mode" data-m="math">🔢 Rechnen</button>
@@ -30,7 +53,7 @@
     <button class="animal" data-a="🐯">🐯<span>Tiger</span></button>
     <button class="animal" data-a="🦩">🦩<span>Flamingo</span></button>
     <button class="animal" data-a="🐰">🐰<span>Hase</span></button>
-    <button class="animal" data-a="ME"><img src="img/maresa.jpg" alt=""><span>Ich selbst!</span></button>
+    <button class="animal" data-a="ME"><span class="avslot" data-size="46"></span><span>Ich selbst!</span></button>
   </div>
   <p style="font-size:.9rem; opacity:.75;">Tipp auf ein Tier, dann geht's zur Schatzkarte 🗺️</p>
 </div>
@@ -38,7 +61,7 @@
 <div id="map" class="screen">
   <div class="bar">
     <button class="btn" id="mapHome">🏠</button>
-    <div class="mid"><img src="img/maresa.jpg" alt=""><span>Schatzkarte</span></div>
+    <div class="mid"><span class="avslot" data-size="34"></span><span>Schatzkarte</span></div>
     <div class="hud" id="mapStation">Station 1</div>
   </div>
   <div id="mapScroll"><div id="mapInner"></div></div>
@@ -71,7 +94,7 @@
   <div class="partybox">
     <div class="star-photo">
       <div class="ring"></div><div class="ring r2"></div><div class="ring r3"></div>
-      <img src="img/maresa.jpg" alt="Maresa">
+      <span class="avslot" data-size="200"></span>
       <div class="crown">👑</div>
       <div class="chest">💰</div>
       <div class="pet" id="partyPet">🦄</div>
@@ -86,14 +109,14 @@
   </div>
 </div>
 
-<script src="js/core.js?v=5"></script>
-<script src="js/games/labyrinth.js?v=5"></script>
-<script src="js/games/bubbles.js?v=5"></script>
-<script src="js/games/memory.js?v=5"></script>
-<script src="js/games/hop.js?v=5"></script>
-<script src="js/games/catch.js?v=5"></script>
-<script src="js/games/train.js?v=5"></script>
-<script src="js/games/bakery.js?v=5"></script>
-<script src="js/games/paint.js?v=5"></script>
+<script src="js/core.js?v=6"></script>
+<script src="js/games/labyrinth.js?v=6"></script>
+<script src="js/games/bubbles.js?v=6"></script>
+<script src="js/games/memory.js?v=6"></script>
+<script src="js/games/hop.js?v=6"></script>
+<script src="js/games/catch.js?v=6"></script>
+<script src="js/games/train.js?v=6"></script>
+<script src="js/games/bakery.js?v=6"></script>
+<script src="js/games/paint.js?v=6"></script>
 </body>
 </html>

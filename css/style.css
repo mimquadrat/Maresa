@@ -239,3 +239,34 @@ button { font-family: inherit; }
 .palette { display: flex; gap: 10px; justify-content: center; margin: 10px 0 4px; flex-wrap: wrap; }
 .swatch { width: 70px; height: 70px; border-radius: 50%; border: 5px solid #fff; font-size: 1.6rem; font-weight: 900; color: #fff; text-shadow: 0 2px 2px rgba(0,0,0,.35); cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,.15); }
 .swatch.sel { transform: scale(1.15); box-shadow: 0 0 0 4px var(--text); }
+
+/* ---------- Spielerauswahl ---------- */
+#players { justify-content: center; gap: 18px; overflow-y: auto; }
+.ptitle { margin: 0; font-size: 1.8rem; text-align: center; background: linear-gradient(90deg,#ff4fa3,#b05cff,#4fa3ff); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.plist { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: 100%; max-width: 400px; }
+.pcard { position: relative; background: #fff; border: 3px solid transparent; border-radius: 24px; padding: 14px 8px 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; box-shadow: 0 5px 16px rgba(91,58,138,.18); cursor: pointer; font-family: inherit; color: var(--text); }
+.pcard:active { transform: scale(.96); border-color: var(--accent2); }
+.pcard .nm { font-weight: 800; font-size: 1.05rem; line-height: 1.15; text-align: center; }
+.pcard .st { font-size: .8rem; opacity: .7; font-weight: 600; }
+.pcard.add { border: 3px dashed #d6c1f5; background: #faf5ff; justify-content: center; }
+.pcard.add .plus { font-size: 3rem; line-height: 1; }
+.pdel { position: absolute; top: 6px; right: 6px; width: 30px; height: 30px; border-radius: 50%; border: none; background: #f3e9ff; color: var(--text); font-size: .9rem; cursor: pointer; }
+.pconfirm { position: absolute; inset: 0; border-radius: 21px; background: rgba(255,255,255,.97); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; font-weight: 800; padding: 8px; text-align: center; }
+.pconfirm div { display: flex; gap: 8px; }
+.pconfirm button { border: none; border-radius: 12px; padding: 8px 12px; font-weight: 800; font-size: .95rem; cursor: pointer; }
+.av-photo { border-radius: 50%; object-fit: cover; border: 3px solid var(--accent2); display: block; }
+.av-emoji { display: flex; align-items: center; justify-content: center; border-radius: 50%; background: linear-gradient(135deg,#ffe3f3,#e8e0ff); border: 3px solid var(--accent2); line-height: 1; }
+.hero .av-photo, .hero .av-emoji { border: 6px solid #fff; box-shadow: 0 0 0 5px var(--accent2), 0 8px 24px rgba(255,79,163,.4); animation: wobble 3s ease-in-out infinite; }
+.star-photo .av-photo, .star-photo .av-emoji { border: 8px solid #fff; animation: glow 0.6s ease-in-out infinite alternate; }
+.swap { position: absolute; top: max(14px, env(safe-area-inset-top)); left: 14px; font-size: .95rem; padding: 8px 12px; }
+#newPlayer { gap: 10px; }
+.npbox { width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 10px; }
+.nplabel { font-weight: 800; font-size: 1.3rem; }
+.npinput { width: 100%; font-size: 1.5rem; font-weight: 700; padding: 14px 16px; border-radius: 18px; border: 3px solid #d6c1f5; text-align: center; color: var(--text); background: #fff; font-family: inherit; -webkit-user-select: text; user-select: text; }
+.npinput:focus { outline: none; border-color: var(--accent2); }
+.figs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; width: 100%; }
+.fig { background: #fff; border: 3px solid transparent; border-radius: 22px; padding: 10px 4px; font-size: 3.2rem; line-height: 1.1; display: flex; flex-direction: column; align-items: center; gap: 4px; box-shadow: 0 4px 12px rgba(91,58,138,.15); cursor: pointer; font-family: inherit; }
+.fig span { font-size: 1rem; font-weight: 700; color: var(--text); }
+.fig.on { border-color: var(--accent2); background: #ffe3f3; }
+.npgo { font-size: 1.3rem; padding: 16px 28px; }
+.npgo:disabled { opacity: .4; }
