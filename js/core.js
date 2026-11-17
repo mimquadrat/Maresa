@@ -174,16 +174,19 @@
         vis: `<div class="word">${w}</div>`, ans: e, opts: shuffle([[w, e], ...others]).map(r => ({ v: r[1], label: r[1] })) };
     }
   };
-  function pool(L) {
+  function pool(L, kind) {
     const math = L <= 2 ? ['dice', 'count'] : L <= 4 ? ['dice', 'count', 'house', 'plus'] : ['count', 'house', 'plus', 'missing'];
     const read = L <= 2 ? ['anlaut'] : L <= 4 ? ['anlaut', 'silben'] : ['anlaut', 'silben', 'lesen'];
-    return M.mode === 'math' ? math : M.mode === 'read' ? read : math.concat(read);
+    if (kind === 'calc') return L <= 4 ? ['plus', 'house'] : ['plus', 'house', 'missing'];   // echte Rechenaufgaben
+    const m = kind || M.mode;
+    return m === 'math' ? math : m === 'read' ? read : math.concat(read);
   }
   let lastType = null;
 
   // Rätsel öffnen – Promise wird erfüllt, sobald es gelöst ist
-  M.quiz = (L, title = '🔑 Schlüssel-Rätsel') => new Promise(resolve => {
-    let p = pool(L); if (p.length > 1) p = p.filter(t => t !== lastType);
+  // kind: 'math' / 'read' / 'calc' (nur Plus & Zahlenhaus) erzwingt eine Aufgabenart, sonst gilt der gewählte Modus
+  M.quiz = (L, title = '🔑 Schlüssel-Rätsel', kind) => new Promise(resolve => {
+    let p = pool(L, kind); if (p.length > 1) p = p.filter(t => t !== lastType);
     lastType = pick(p);
     const cur = TASKS[lastType](L);
     let tries = 0;
@@ -236,13 +239,14 @@
   // =====================================================================
   M.games = {};
   M.register = (id, g) => { M.games[id] = g; };
-  const ORDER = ['labyrinth', 'bubbles', 'memory', 'hop', 'catch', 'train', 'bakery', 'paint'];
+  const ORDER = ['labyrinth', 'pacman', 'bubbles', 'memory', 'hop', 'catch', 'train', 'bakery', 'paint'];
   const ISLANDS = [
     ['🦄 Einhorn-Wiese', '#ff8fc8'], ['🌴 Palmen-Strand', '#ffb84f'], ['🏰 Ritter-Burg', '#9c7cf0'],
     ['🌊 Glitzer-Meer', '#4fb6ff'], ['🍭 Zuckerland', '#ff6fa8'], ['🌋 Feuerberg', '#ff7a4f'],
     ['❄️ Eisschloss', '#7cc8f0'], ['🚀 Sternenhimmel', '#6a5cff']
   ];
   M.island = i => ISLANDS[i % ISLANDS.length];
+  const N = ORDER.length;   // Stationen pro Insel
 
   function show(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -350,38 +354,61 @@
     });
   });
 
-  // ---------- Karte ----------
-  const STEP = 108, TOP = 70, HEAD = 104;
+  // ---------- Karte (Schatzkarte) ----------
+  const STEP = 108, TOP = 120, HEAD = 104, GAP = 110;
+  const ISL_H = N * STEP + HEAD + 10, STRIDE = N * STEP + HEAD + GAP;
+  const SHAPES = ['42% 58% 48% 52% / 7% 5% 8% 6%', '58% 42% 55% 45% / 5% 8% 5% 7%', '50% 50% 40% 60% / 8% 6% 7% 5%', '45% 55% 60% 40% / 6% 7% 5% 8%'];
+  const SEA = ['⛵', '🐙', '🐳', '🦈', '🐢', '🦑', '🏴‍☠️', '🐬'];
+  const mapW = () => Math.min($('mapScroll').clientWidth || 360, 480);
   function stationPos(i) {
-    const isl = Math.floor(i / 8), k = i % 8;
-    const w = Math.min($('mapScroll').clientWidth || 360, 480);
-    const x = w / 2 + Math.sin(k * 1.1) * (w / 2 - 70);
-    const y = TOP + isl * (8 * STEP + HEAD + 30) + HEAD + k * STEP;
+    const isl = Math.floor(i / N), k = i % N;
+    const w = mapW();
+    const x = w / 2 + Math.sin(k * 1.1) * (w / 2 - 74);
+    const y = TOP + isl * STRIDE + HEAD + k * STEP;
     return { x, y };
+  }
+  // weiche Kurve durch alle Stationen
+  function curve(pts) {
+    let d = `M${pts[0].x.toFixed(0)} ${pts[0].y.toFixed(0)}`;
+    for (let i = 1; i < pts.length - 1; i++) {
+      const mx = (pts[i].x + pts[i + 1].x) / 2, my = (pts[i].y + pts[i + 1].y) / 2;
+      d += ` Q${pts[i].x.toFixed(0)} ${pts[i].y.toFixed(0)} ${mx.toFixed(0)} ${my.toFixed(0)}`;
+    }
+    const l = pts[pts.length - 1]; return d + ` L${l.x.toFixed(0)} ${l.y.toFixed(0)}`;
   }
   function openMap(greet) {
     show('map');
     const inner = $('mapInner');
-    const lastIsland = Math.floor(M.progress / 8) + 1;
-    const total = (lastIsland + 1) * 8;
-    let html = '', pts = [];
+    const lastIsland = Math.floor(M.progress / N) + 1;
+    const total = (lastIsland + 1) * N;
+    const w = mapW();
+    let html = `<div class="mapTitle">🏴‍☠️ Schatzkarte von ${esc(M.name)}</div><div class="compass">🧭</div>`, pts = [];
     for (let isl = 0; isl <= lastIsland; isl++) {
       const [name, col] = M.island(isl);
-      const y0 = TOP + isl * (8 * STEP + HEAD + 30) - 20;
-      html += `<div class="island" style="top:${y0}px;height:${8 * STEP + HEAD + 10}px;background:linear-gradient(180deg, ${col}, ${col}55)"><h2>Insel ${isl + 1}: ${name}</h2></div>`;
+      const y0 = TOP + isl * STRIDE - 20;
+      html += `<div class="island" style="top:${y0}px;height:${ISL_H}px;border-radius:${SHAPES[isl % SHAPES.length]};background:radial-gradient(ellipse at 50% 40%, ${col}55, ${col}22 70%), #e2c47f"><h2>Insel ${isl + 1}: ${name}</h2></div>`;
+      // Palmen & Felsen am Inselrand – immer auf der Seite, wo gerade keine Station ist
+      for (let k = 1; k < N; k += 2) {
+        const right = Math.sin(k * 1.1) < 0, y = TOP + isl * STRIDE + HEAD + k * STEP;
+        html += `<div class="deco" style="left:${right ? w - 40 : 40}px;top:${y}px">${['🌴', '🪨', '🌴', '🌵', '🌴'][(k + isl) % 5]}</div>`;
+      }
+      // Meer zwischen den Inseln
+      const sy = y0 + ISL_H + (GAP - 10) / 2 + 14;
+      html += `<div class="deco sea" style="left:${w * .22}px;top:${sy}px">${SEA[(isl * 3) % SEA.length]}</div><div class="deco sea" style="left:${w * .78}px;top:${sy - 10}px;animation-delay:.8s">${SEA[(isl * 3 + 1) % SEA.length]}</div><div class="waves" style="top:${sy - 22}px">〰️ 〰️ 〰️</div>`;
     }
     for (let i = 0; i < total; i++) {
       const p = stationPos(i); pts.push(p);
-      const g = M.games[ORDER[i % 8]];
+      const g = M.games[ORDER[i % N]];
       const cls = i < M.progress ? 'done' : i === M.progress ? 'current' : 'locked';
+      if (i % N === N - 1) html += `<div class="xmark" style="left:${p.x}px;top:${p.y}px">✖</div>`;
       html += `<button class="station ${cls}" data-i="${i}" style="left:${p.x}px;top:${p.y}px">${g.icon}<small>${g.name}</small></button>`;
     }
     const cur = stationPos(M.progress);
     html += `<div class="mapPet" id="mapPet" style="left:${cur.x}px;top:${cur.y}px">${M.petHTML(50)}</div>`;
-    const h = pts[pts.length - 1].y + 120;
-    const path = pts.map((p, i) => (i ? 'L' : 'M') + p.x.toFixed(0) + ' ' + p.y.toFixed(0)).join(' ');
+    const h = pts[pts.length - 1].y + 140;
+    const path = curve(pts);
     inner.style.height = h + 'px';
-    inner.innerHTML = `<svg width="100%" height="${h}"><path d="${path}" fill="none" stroke="#fff" stroke-width="10" stroke-dasharray="2 18" stroke-linecap="round"/></svg>` + html;
+    inner.innerHTML = `<svg width="100%" height="${h}"><path d="${path}" fill="none" stroke="rgba(90,52,18,.25)" stroke-width="9" stroke-linecap="round" transform="translate(2 3)"/><path d="${path}" fill="none" stroke="#b8322a" stroke-width="6" stroke-dasharray="14 12" stroke-linecap="round"/></svg>` + html;
     inner.querySelectorAll('.station').forEach(b => b.onclick = () => {
       const i = +b.dataset.i; if (i > M.progress) { M.boop(); M.say('Das ist noch zu. Spiel erst die Station davor!'); return; }
       startStation(i);
@@ -397,8 +424,8 @@
   let current = null;
   function startStation(i) {
     leaveGame();
-    const id = ORDER[i % 8], g = M.games[id];
-    const round = Math.floor(i / 8) + 1;
+    const id = ORDER[i % N], g = M.games[id];
+    const round = Math.floor(i / N) + 1;
     current = { station: i, id, round };
     $('gTitle').textContent = g.icon + ' ' + g.name;
     $('hud').textContent = '';
@@ -480,7 +507,7 @@
     const s = current.station;
     const g = M.games[current.id];
     store.set('maresaSchaetze', store.num('maresaSchaetze') + 1); showStats();
-    const islandDone = s === M.progress && s % 8 === 7;
+    const islandDone = s === M.progress && s % N === N - 1;
     if (s === M.progress) { M.progress++; store.set('maresaStation', M.progress); }
     const p = $('party');
     $('partyPet').textContent = M.animal === 'ME' ? '🌟' : M.animal;
