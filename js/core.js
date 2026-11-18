@@ -239,7 +239,7 @@
   // =====================================================================
   M.games = {};
   M.register = (id, g) => { M.games[id] = g; };
-  const ORDER = ['labyrinth', 'pacman', 'bubbles', 'memory', 'hop', 'catch', 'train', 'bakery', 'paint'];
+  const ORDER = ['labyrinth', 'bubbles', 'memory', 'hop', 'catch', 'train', 'bakery', 'paint', 'pacman'];   // Mampf-Jagd als Schatz-Finale jeder Insel
   const ISLANDS = [
     ['🦄 Einhorn-Wiese', '#ff8fc8'], ['🌴 Palmen-Strand', '#ffb84f'], ['🏰 Ritter-Burg', '#9c7cf0'],
     ['🌊 Glitzer-Meer', '#4fb6ff'], ['🍭 Zuckerland', '#ff6fa8'], ['🌋 Feuerberg', '#ff7a4f'],
