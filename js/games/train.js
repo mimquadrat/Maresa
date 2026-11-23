@@ -5,7 +5,8 @@ M.register('train', {
   start(stage, { round, done }) {
     const goal = 4;
     const pool = M.WORDS.filter(w => { const n = w[2].split('-').length; return round === 1 ? n === 2 : n >= 2; });
-    const words = M.shuffle(pool.slice()).slice(0, goal);
+    const fresh = M.shuffle(pool.filter(w => M.NEWEST.includes(w[0][0]))).slice(0, 2);
+    const words = M.shuffle(fresh.concat(M.shuffle(pool.filter(w => !fresh.includes(w))).slice(0, goal - fresh.length)));
     let idx = 0, alive = true;
     stage.innerHTML = `<div class="big-emoji" style="margin-top:6px" id="tEmoji"></div>
       <div class="track"><div class="rails"></div><div class="train" id="train"></div></div>

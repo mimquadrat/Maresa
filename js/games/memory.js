@@ -1,16 +1,21 @@
-/* 🃏 Memory: Paare finden – Würfel↔Zahl, groß↔klein, Bild↔Anfangsbuchstabe */
+/* 🃏 Memory: Paare finden – Würfel↔Zahl, groß↔klein, Bild↔Anfangsbuchstabe, Wort↔Bild */
 M.register('memory', {
   name: 'Memory', icon: '🃏',
   howto: r => 'Dreh immer zwei Karten um und finde die Paare, die zusammengehören!',
   start(stage, { round, done }) {
     const nPairs = round === 1 ? 4 : round === 2 ? 6 : 8;
-    let kinds = M.mode === 'math' ? ['dice'] : M.mode === 'read' ? ['case', 'anlaut'] : ['dice', 'case', 'anlaut'];
+    const readKinds = round >= 2 ? ['case', 'anlaut', 'lesen', 'lesen'] : ['case', 'anlaut'];
+    let kinds = M.mode === 'math' ? ['dice'] : M.mode === 'read' ? readKinds : ['dice'].concat(readKinds);
     const kind = M.pick(kinds);
     let pairs = [];
     if (kind === 'dice') {
       M.shuffle([1, 2, 3, 4, 5, 6]).slice(0, Math.min(nPairs, 6)).forEach(n => pairs.push([{ html: M.dice(n), say: '' }, { html: String(n), say: String(n) }]));
     } else if (kind === 'case') {
-      M.shuffle(M.LEARNED.concat(['E', 'L', 'T', 'N', 'H'])).slice(0, nPairs).forEach(L => pairs.push([{ html: L, say: L }, { html: L.toLowerCase(), say: L }]));
+      M.NEWEST.concat(M.shuffle(M.LEARNED.filter(l => !M.NEWEST.includes(l)).concat(['E', 'L', 'H']))).slice(0, nPairs).forEach(L => pairs.push([{ html: L, say: L }, { html: L.toLowerCase(), say: L }]));
+    } else if (kind === 'lesen') {
+      const seen = new Set();
+      M.shuffle(M.READ.slice()).filter(r => !seen.has(r[1]) && seen.add(r[1])).slice(0, nPairs)
+        .forEach(([w, e]) => pairs.push([{ html: `<span style="font-size:${w.length > 4 ? 1.1 : 1.5}rem;letter-spacing:1px">${w}</span>`, say: '' }, { html: `<span style="font-size:2.8rem">${e}</span>`, say: '' }]));
     } else {
       const letters = M.shuffle([...new Set(M.WORDS.map(w => w[0][0]))].filter(L => !['Ö', 'Ü', 'Ä'].includes(L))).slice(0, nPairs);
       letters.forEach(L => { const w = M.pick(M.wordsWith(L)); if (w) pairs.push([{ html: `<span style="font-size:2.8rem">${w[1]}</span>`, say: w[0] }, { html: L, say: L }]); });

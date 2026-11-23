@@ -5,7 +5,7 @@ M.register('catch', {
   start(stage, { round, done }) {
     // Buchstaben mit genug passenden Bildern
     const letters = M.LEARNED.filter(L => M.wordsWith(L).length >= 2);
-    const T = M.pick(letters);
+    const T = M.pickLetter(letters);
     const good = M.wordsWith(T), bad = M.WORDS.filter(w => w[0][0].toUpperCase() !== T);
     const goal = round === 1 ? 6 : 8;
     let caught = 0, alive = true;
@@ -20,7 +20,7 @@ M.register('catch', {
     size();
     const hud = () => M.setHud(`🧺 ${T} · ${caught}/${goal}`);
     hud();
-    M.say(`Fang alles, was mit ${T} anfängt! Zum Beispiel ${good[0][0]}.`);
+    M.say(`Fang alles, was mit ${T} anfängt! Zum Beispiel ${M.pick(good)[0]}.`);
     const items = [], pops = [];
     let spawnT = 30, last = 0, raf;
     function spawn() {

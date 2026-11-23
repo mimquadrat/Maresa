@@ -14,7 +14,9 @@ M.register('pacman', {
 
     // Buchstaben mit genug passenden Bildern (zuerst die aus dem Heft)
     const ok = l => M.wordsWith(l).length >= 2;
-    const letters = M.shuffle(M.LEARNED.filter(ok)).concat(M.shuffle(['B', 'H', 'K', 'E', 'T'].filter(ok)));
+    // erste Runde mit einem ganz neuen Buchstaben (T oder N), dann gemischt
+    const fresh = M.shuffle(M.NEWEST.filter(ok)).slice(0, 1);
+    const letters = [...new Set(fresh.concat(M.shuffle(M.LEARNED.filter(ok)), M.shuffle(['B', 'H', 'K', 'E'].filter(ok))))];
 
     let runde = 0, grid, GW, GH, tile = 0, player, ghosts = [], items = [], dots, T, need, got = [];
     let busy = true, alive = true, invul = 0, raf, last = 0, t0 = performance.now(), dotSound = 0;

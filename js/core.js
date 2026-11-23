@@ -104,7 +104,8 @@
   };
 
   // =====================================================================
-  //  LERNSTOFF – nach „Richtig rechnen 1“ (S. 1–7) und „Frohes Lernen 1“ (S. 1–35)
+  //  LERNSTOFF – nach „Richtig rechnen 1“ (S. 1–7), „Frohes Lernen 1“ (S. 1–38: neu T t und N n)
+  //  und den Leseblättern/Silbenteppichen 1–5 (M, A, I, O, S, U, R)
   // =====================================================================
   M.WORDS = [ // Wort, Bild, Silben
     ['Elefant','🐘','E-le-fant'], ['Salat','🥬','Sa-lat'], ['Haus','🏠','Haus'], ['Dino','🦕','Di-no'],
@@ -118,11 +119,31 @@
     ['Krone','👑','Kro-ne'], ['Wal','🐋','Wal'], ['Tiger','🐯','Ti-ger'], ['Zebra','🦓','Ze-bra'],
     ['Melone','🍉','Me-lo-ne'], ['Kamel','🐫','Ka-mel'], ['Raupe','🐛','Rau-pe'], ['Tomate','🍅','To-ma-te'],
     ['Orange','🍊','O-ran-ge'], ['Ohr','👂','Ohr'], ['Uhr','⌚','Uhr'], ['Affe','🐒','Af-fe'],
-    ['Schaf','🐑','Schaf'], ['Möhre','🥕','Möh-re'], ['Mais','🌽','Mais'], ['Rabe','🐦‍⬛','Ra-be']
+    ['Schaf','🐑','Schaf'], ['Möhre','🥕','Möh-re'], ['Mais','🌽','Mais'], ['Rabe','🐦‍⬛','Ra-be'],
+    // neu: Frohes Lernen S. 36–38 (T t, N n)
+    ['Tor','🥅','Tor'], ['Turm','🗼','Turm'], ['Tasse','☕','Tas-se'], ['Teddy','🧸','Ted-dy'],
+    ['Taxi','🚕','Ta-xi'], ['Torte','🎂','Tor-te'], ['Tür','🚪','Tür'], ['Trommel','🥁','Trom-mel'],
+    ['Nudel','🍜','Nu-del'], ['Nuss','🥜','Nuss'], ['Nashorn','🦏','Nas-horn'], ['Nadel','🪡','Na-del'],
+    ['Gespenst','👻','Ge-spenst'], ['Spinne','🕷️','Spin-ne'], ['Mama','👩','Ma-ma'], ['Moos','🌿','Moos']
   ];
-  M.LEARNED = ['M', 'I', 'A', 'O', 'S', 'U', 'R'];      // im Heft schon geübt
+  M.LEARNED = ['M', 'I', 'A', 'O', 'S', 'U', 'R', 'T', 'N'];      // im Heft schon geübt
+  M.NEWEST = ['T', 'N'];                                          // gerade neu – kommen öfter dran
+  M.pickLetter = (list = M.LEARNED) => { const n = M.NEWEST.filter(l => list.includes(l)); return n.length && Math.random() < .45 ? M.pick(n) : M.pick(list); };
   M.LETTERS = 'ABDEFGHIKLMNOPRSTUWZ'.split('');
-  M.READ = [['OMA','👵'], ['MAMA','👩'], ['MAUS','🐭'], ['ARM','💪'], ['ROSE','🌹'], ['SOFA','🛋️'], ['UFO','🛸'], ['AUTO','🚗'], ['HASE','🐰'], ['NASE','👃'], ['SONNE','☀️'], ['MOND','🌙']];
+  M.READ = [['OMA','👵'], ['MAMA','👩'], ['MAUS','🐭'], ['ARM','💪'], ['ROSE','🌹'], ['SOFA','🛋️'], ['UFO','🛸'], ['AUTO','🚗'], ['HASE','🐰'], ['NASE','👃'], ['SONNE','☀️'], ['MOND','🌙'],
+    ['TOR','🥅'], ['ROT','🔴'], ['TURM','🗼'], ['MAIS','🌽'], ['MOOS','🌿'], ['NUSS','🥜'], ['TOMATE','🍅']];
+  // Silbenteppich: Silben aus den gelernten Buchstaben (Leseblatt 1–5 + T, N)
+  M.SYLL_CONS = ['M', 'S', 'R', 'T', 'N'];
+  M.SYLL_VOW = ['a', 'i', 'o', 'u'];
+  M.syllable = () => M.pickLetter(M.SYLL_CONS) + M.pick(M.SYLL_VOW);
+  // Wörter, die man oft braucht (Frohes Lernen S. 37)
+  M.SIGHT = ['im', 'am', 'um', 'ist', 'mit'];
+  // Lese-Sätze aus Leseblatt 1–5 & der Gespenster-Geschichte von Toni
+  M.SENTENCES = [
+    ['Oma ist im Haus.', '👵', '🏠'], ['Mama ist am Mais.', '👩', '🌽'], ['Toni ist ein Gespenst.', '👻', ''],
+    ['Die Rose ist rot.', '🌹', ''], ['Da ist eine Spinne.', '🕷️', ''], ['Mia ist am Tor.', '👧', '🥅'],
+    ['Die Maus ist im Moos.', '🐭', '🌿'], ['Oma ist mit Mama im Turm.', '👵', '🗼']
+  ];
   M.wordsWith = L => M.WORDS.filter(w => w[0][0].toUpperCase() === L && !w[0].startsWith('Sch'));
 
   M.numOpts = (ans, lo, hi) => {
@@ -155,7 +176,9 @@
       return { text: 'Was fehlt?', speak: `${T} ist gleich ${a} plus wie viel?`, vis: `<div class="sum">${T} = ${a} + <span class="q">?</span></div>${M.field(T, a)}`, ans: T - a, opts: M.numOpts(T - a, 0, 10) };
     },
     anlaut(L) {
-      const [w, e] = pick(M.WORDS.filter(x => !x[0].startsWith('Sch'))), A = w[0].toUpperCase();
+      const cand = M.WORDS.filter(x => !x[0].startsWith('Sch'));
+      const newer = cand.filter(x => M.NEWEST.includes(x[0][0]));
+      const [w, e] = pick(Math.random() < .35 ? newer : cand), A = w[0].toUpperCase();
       const others = shuffle(M.LETTERS.filter(x => x !== A)).slice(0, 2);
       const showBoxes = L >= 3 && w.length <= 7;
       const boxes = showBoxes ? '<div class="boxes">' + [...w.toUpperCase()].map((c, i) => i === 0 ? '<span class="q">?</span>' : `<span>${c}</span>`).join('') + '</div>' : '';
@@ -172,11 +195,38 @@
       const others = shuffle(M.READ.filter(r => r[0] !== w && r[1] !== e)).slice(0, 2);
       return { text: 'Lies das Wort! Welches Bild passt?', speak: 'Lies das Wort. Welches Bild passt dazu?', hintSpeak: w,
         vis: `<div class="word">${w}</div>`, ans: e, opts: shuffle([[w, e], ...others]).map(r => ({ v: r[1], label: r[1] })) };
+    },
+    // Silbenteppich: Silbe hören, richtige Silbe antippen
+    silbe(L) {
+      const a = M.syllable(), opts = new Set([a]);
+      while (opts.size < 3) { const c = Math.random() < .5 ? a[0] + M.pick(M.SYLL_VOW) : M.pick(M.SYLL_CONS) + a[1]; opts.add(c); }
+      return { text: 'Hör gut zu! Welche Silbe ist es?', speak: `Tipp auf die Silbe ${a.toLowerCase()}. ${a.toLowerCase()}!`, hintSpeak: a.toLowerCase(),
+        vis: '<div class="big-emoji">👂</div>', ans: a, opts: shuffle([...opts]).map(v => ({ v, label: v })) };
+    },
+    // m oder n? (Frohes Lernen S. 38)
+    mn(L) {
+      const list = M.WORDS.filter(w => { const x = w[0].toLowerCase(); return x.includes('m') !== x.includes('n'); });
+      const [w, e] = pick(list), ans = w.toLowerCase().includes('m') ? 'M' : 'N';
+      return { text: 'Hörst du M oder N?', speak: `${w}. Hörst du M, oder N, in ${w}?`, hintSpeak: w,
+        vis: `<div class="big-emoji">${e}</div>`, ans, opts: ['M', 'N'].map(v => ({ v, label: `${v}<small>${v.toLowerCase()}</small>` })) };
+    },
+    // Wörter, die man oft braucht: im, am, um, ist, mit
+    merk(L) {
+      const a = pick(M.SIGHT), others = shuffle(M.SIGHT.filter(x => x !== a)).slice(0, 2);
+      return { text: 'Welches Wort hörst du?', speak: `Tipp auf das Wort: ${a}.`, hintSpeak: a,
+        vis: '<div class="big-emoji">📖</div>', ans: a, opts: shuffle([a, ...others]).map(v => ({ v, label: v })) };
+    },
+    // kleiner Satz lesen, passendes Bild wählen
+    satz(L) {
+      const s = pick(M.SENTENCES), pic = r => r[1] + r[2];
+      const others = shuffle(M.SENTENCES.filter(r => pic(r) !== pic(s) && r[1] !== s[1])).slice(0, 2);
+      return { text: 'Lies den Satz! Welches Bild passt?', speak: 'Lies den Satz. Welches Bild passt?', hintSpeak: s[0],
+        vis: `<div class="word" style="font-size:1.7rem;letter-spacing:1px">${s[0]}</div>`, ans: pic(s), opts: shuffle([s, ...others]).map(r => ({ v: pic(r), label: pic(r) })) };
     }
   };
   function pool(L, kind) {
     const math = L <= 2 ? ['dice', 'count'] : L <= 4 ? ['dice', 'count', 'house', 'plus'] : ['count', 'house', 'plus', 'missing'];
-    const read = L <= 2 ? ['anlaut'] : L <= 4 ? ['anlaut', 'silben'] : ['anlaut', 'silben', 'lesen'];
+    const read = L <= 2 ? ['anlaut', 'silbe'] : L <= 4 ? ['anlaut', 'silben', 'silbe', 'mn', 'merk'] : ['anlaut', 'silben', 'lesen', 'silbe', 'mn', 'merk', 'satz'];
     if (kind === 'calc') return L <= 4 ? ['plus', 'house'] : ['plus', 'house', 'missing'];   // echte Rechenaufgaben
     const m = kind || M.mode;
     return m === 'math' ? math : m === 'read' ? read : math.concat(read);
@@ -354,18 +404,23 @@
     });
   });
 
-  // ---------- Karte (Schatzkarte) ----------
-  const STEP = 108, TOP = 120, HEAD = 104, GAP = 110;
-  const ISL_H = N * STEP + HEAD + 10, STRIDE = N * STEP + HEAD + GAP;
-  const SHAPES = ['42% 58% 48% 52% / 7% 5% 8% 6%', '58% 42% 55% 45% / 5% 8% 5% 7%', '50% 50% 40% 60% / 8% 6% 7% 5%', '45% 55% 60% 40% / 6% 7% 5% 8%'];
+  // ---------- Karte (Schatzkarte) – immer genau EINE Insel, passt auf einen Bildschirm ----------
   const SEA = ['⛵', '🐙', '🐳', '🦈', '🐢', '🦑', '🏴‍☠️', '🐬'];
-  const mapW = () => Math.min($('mapScroll').clientWidth || 360, 480);
-  function stationPos(i) {
-    const isl = Math.floor(i / N), k = i % N;
-    const w = mapW();
-    const x = w / 2 + Math.sin(k * 1.1) * (w / 2 - 74);
-    const y = TOP + isl * STRIDE + HEAD + k * STEP;
-    return { x, y };
+  const DECO = ['🌴', '🪨', '🌵', '🌺', '🍄', '🌴'];
+  let viewIsland = null;
+  // Schlangenweg: 3 Reihen à 3 Stationen (links→rechts, rechts→links, links→rechts)
+  function layout(w, h) {
+    const cols = 3, rows = Math.ceil(N / cols);
+    const top = 132, bottom = Math.max(top + (rows - 1) * 118, h - 92);
+    const gap = (bottom - top) / (rows - 1);
+    const pts = [];
+    for (let k = 0; k < N; k++) {
+      const r = Math.floor(k / cols), c0 = k % cols, c = r % 2 ? cols - 1 - c0 : c0;
+      const x = w * (0.19 + c * 0.31);
+      const y = top + r * gap + (c === 1 ? gap * 0.16 : 0) * (r === 0 ? 1 : -1);
+      pts.push({ x, y });
+    }
+    return { pts, height: bottom + 92 };
   }
   // weiche Kurve durch alle Stationen
   function curve(pts) {
@@ -376,45 +431,49 @@
     }
     const l = pts[pts.length - 1]; return d + ` L${l.x.toFixed(0)} ${l.y.toFixed(0)}`;
   }
-  function openMap(greet) {
+  function openMap(greet, isl) {
     show('map');
-    const inner = $('mapInner');
-    const lastIsland = Math.floor(M.progress / N) + 1;
-    const total = (lastIsland + 1) * N;
-    const w = mapW();
-    let html = `<div class="mapTitle">🏴‍☠️ Schatzkarte von ${esc(M.name)}</div><div class="compass">🧭</div>`, pts = [];
-    for (let isl = 0; isl <= lastIsland; isl++) {
-      const [name, col] = M.island(isl);
-      const y0 = TOP + isl * STRIDE - 20;
-      html += `<div class="island" style="top:${y0}px;height:${ISL_H}px;border-radius:${SHAPES[isl % SHAPES.length]};background:radial-gradient(ellipse at 50% 40%, ${col}55, ${col}22 70%), #e2c47f"><h2>Insel ${isl + 1}: ${name}</h2></div>`;
-      // Palmen & Felsen am Inselrand – immer auf der Seite, wo gerade keine Station ist
-      for (let k = 1; k < N; k += 2) {
-        const right = Math.sin(k * 1.1) < 0, y = TOP + isl * STRIDE + HEAD + k * STEP;
-        html += `<div class="deco" style="left:${right ? w - 40 : 40}px;top:${y}px">${['🌴', '🪨', '🌴', '🌵', '🌴'][(k + isl) % 5]}</div>`;
-      }
-      // Meer zwischen den Inseln
-      const sy = y0 + ISL_H + (GAP - 10) / 2 + 14;
-      html += `<div class="deco sea" style="left:${w * .22}px;top:${sy}px">${SEA[(isl * 3) % SEA.length]}</div><div class="deco sea" style="left:${w * .78}px;top:${sy - 10}px;animation-delay:.8s">${SEA[(isl * 3 + 1) % SEA.length]}</div><div class="waves" style="top:${sy - 22}px">〰️ 〰️ 〰️</div>`;
-    }
-    for (let i = 0; i < total; i++) {
-      const p = stationPos(i); pts.push(p);
-      const g = M.games[ORDER[i % N]];
+    const curIsland = Math.floor(M.progress / N);
+    if (isl != null) viewIsland = isl;
+    if (viewIsland == null || greet) viewIsland = curIsland;
+    viewIsland = Math.max(0, Math.min(viewIsland, curIsland + 1));
+    const inner = $('mapInner'), sc = $('mapScroll');
+    const w = Math.min(sc.clientWidth || 360, 480), hAvail = sc.clientHeight || 560;
+    const { pts, height } = layout(w, hAvail);
+    const h = Math.max(hAvail, height);
+    const [name, col] = M.island(viewIsland);
+    const base = viewIsland * N;
+    let html = `<div class="island one" style="background:radial-gradient(ellipse at 50% 45%, ${col}66, ${col}22 70%), #e2c47f"></div>`;
+    html += `<div class="islandNav"><button class="inav" id="islPrev" ${viewIsland > 0 ? '' : 'disabled'}>◀</button>`
+      + `<h2>Insel ${viewIsland + 1}<br><span>${name}</span></h2>`
+      + `<button class="inav" id="islNext" ${viewIsland <= curIsland ? '' : 'disabled'}>▶</button></div>`;
+    // Deko zwischen den Reihen + Meer an den Ecken
+    [[.13, (pts[0].y + pts[5].y) / 2 + 20], [.87, (pts[3].y + pts[8].y) / 2 - 20], [.07, pts[0].y - 52], [.5, (pts[4].y + pts[7].y) / 2 + 8]].forEach(([fx, y], j) =>
+      html += `<div class="deco" style="left:${w * fx}px;top:${y}px">${DECO[(j + viewIsland) % DECO.length]}</div>`);
+    html += `<div class="deco sea" style="left:${w * .06}px;top:${h - 24}px">${SEA[(viewIsland * 3) % SEA.length]}</div><div class="deco sea" style="left:${w * .92}px;top:${108}px;animation-delay:.8s">${SEA[(viewIsland * 3 + 1) % SEA.length]}</div>`;
+    pts.forEach((p, k) => {
+      const i = base + k, g = M.games[ORDER[k]];
       const cls = i < M.progress ? 'done' : i === M.progress ? 'current' : 'locked';
-      if (i % N === N - 1) html += `<div class="xmark" style="left:${p.x}px;top:${p.y}px">✖</div>`;
+      if (k === N - 1) html += `<div class="xmark" style="left:${p.x}px;top:${p.y}px">✖</div>`;
       html += `<button class="station ${cls}" data-i="${i}" style="left:${p.x}px;top:${p.y}px">${g.icon}<small>${g.name}</small></button>`;
+    });
+    if (viewIsland === curIsland) {
+      const cp = pts[M.progress % N];
+      html += `<div class="mapPet" id="mapPet" style="left:${cp.x}px;top:${cp.y}px">${M.petHTML(50)}</div>`;
     }
-    const cur = stationPos(M.progress);
-    html += `<div class="mapPet" id="mapPet" style="left:${cur.x}px;top:${cur.y}px">${M.petHTML(50)}</div>`;
-    const h = pts[pts.length - 1].y + 140;
     const path = curve(pts);
     inner.style.height = h + 'px';
+    inner.classList.add('compact');
     inner.innerHTML = `<svg width="100%" height="${h}"><path d="${path}" fill="none" stroke="rgba(90,52,18,.25)" stroke-width="9" stroke-linecap="round" transform="translate(2 3)"/><path d="${path}" fill="none" stroke="#b8322a" stroke-width="6" stroke-dasharray="14 12" stroke-linecap="round"/></svg>` + html;
     inner.querySelectorAll('.station').forEach(b => b.onclick = () => {
       const i = +b.dataset.i; if (i > M.progress) { M.boop(); M.say('Das ist noch zu. Spiel erst die Station davor!'); return; }
       startStation(i);
     });
-    $('mapStation').textContent = 'Station ' + (M.progress + 1);
-    requestAnimationFrame(() => { $('mapScroll').scrollTop = Math.max(0, cur.y - $('mapScroll').clientHeight / 2); });
+    const prev = $('islPrev'), next = $('islNext');
+    prev.onclick = () => { M.blip(); openMap(false, viewIsland - 1); };
+    next.onclick = () => { M.blip(); openMap(false, viewIsland + 1); if (viewIsland > curIsland) M.say('Diese Insel wartet noch auf dich!'); };
+    $('mapStation').textContent = 'Station ' + (M.progress % N + 1) + '/' + N;
+    sc.scrollTop = 0;
     if (greet) M.say(M.progress === 0 ? 'Hallo ' + M.name + '! Tipp auf die erste Station!' : 'Weiter geht\'s! Tipp auf die leuchtende Station!');
   }
   M.openMap = openMap;

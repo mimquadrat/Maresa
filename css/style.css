@@ -300,3 +300,17 @@ button { font-family: inherit; }
 /* Steuerkreuz: ▶ nicht mit der grünen „richtig"-Markierung verwechseln */
 .pad button.right { background: var(--card) !important; color: var(--accent) !important; box-shadow: 0 3px 10px rgba(91, 58, 138, 0.18) !important; animation: none !important; }
 .pad button.right:active { background: #ffe3f3 !important; }
+
+/* ---------- Kompakte Schatzkarte: eine Insel pro Bildschirm ---------- */
+#mapInner.compact { overflow: hidden; }
+.island.one { top: 10px; bottom: 10px; left: 10px; right: 10px; border-radius: 46% 54% 44% 56% / 9% 7% 10% 8%; }
+.islandNav { position: absolute; top: 18px; left: 0; right: 0; display: flex; align-items: center; justify-content: center; gap: 10px; z-index: 3; }
+.islandNav h2 { margin: 0; padding: 4px 14px; text-align: center; font-family: Georgia, "Times New Roman", serif; font-size: .95rem; line-height: 1.15; color: #5a3412; background: #f7e7bf; border: 3px double #7a4a1f; border-radius: 6px; transform: rotate(-1.5deg); box-shadow: 0 3px 0 rgba(90,52,18,.25); }
+.islandNav h2 span { font-size: 1.15rem; font-weight: 900; font-style: italic; white-space: nowrap; }
+.inav { width: 46px; height: 46px; border-radius: 50%; border: 3px solid #7a4a1f; background: #f7e7bf; color: #5a3412; font-size: 1.2rem; font-weight: 900; box-shadow: 0 3px 0 rgba(90,52,18,.35); cursor: pointer; }
+.inav:disabled { opacity: .3; cursor: default; }
+.compact .station { width: 70px; height: 70px; margin: -35px 0 0 -35px; font-size: 2.1rem; }
+.compact .station small { bottom: auto; top: 72px; white-space: normal; width: 96px; left: 50%; margin-left: -48px; text-align: center; line-height: 1.1; padding: 1px 4px; font-size: .72rem; }
+.compact .xmark { font-size: 6.5rem; }
+.compact .mapPet { margin: -80px 0 0 -28px; }
+.lernstand { font-size: .68rem; opacity: .5; margin: 6px 12px 0; line-height: 1.3; text-align: center; }
