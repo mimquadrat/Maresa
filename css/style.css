@@ -314,3 +314,140 @@ button { font-family: inherit; }
 .compact .xmark { font-size: 6.5rem; }
 .compact .mapPet { margin: -80px 0 0 -28px; }
 .lernstand { font-size: .68rem; opacity: .5; margin: 6px 12px 0; line-height: 1.3; text-align: center; }
+
+/* ---------- Tages-Schatz & Album ---------- */
+.extras { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.xbtn { border: none; border-radius: 99px; padding: 9px 16px; font-size: 1rem; font-weight: 800; color: #fff; background: linear-gradient(90deg, #ff9f1c, #ff4fa3); box-shadow: 0 4px 0 #c23a7e; cursor: pointer; }
+.xbtn:active { transform: translateY(3px); box-shadow: 0 1px 0 #c23a7e; }
+#albumBtn { background: linear-gradient(90deg, #4fb6ff, #b05cff); box-shadow: 0 4px 0 #6d3fbf; }
+#dailyBtn:not(.done) { animation: pulse .9s ease-in-out infinite alternate; }
+#dailyBtn.done { background: #2fbf71; box-shadow: 0 4px 0 #1f8a50; }
+#album { gap: 10px; overflow-y: auto; touch-action: pan-y; }
+.albumHint { margin: 0; font-weight: 700; }
+.albumGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; max-width: 420px; }
+.stk { aspect-ratio: 1; border-radius: 18px; border: 3px dashed #d6c1f5; background: rgba(255,255,255,.55); font-size: 2.4rem; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #c4b0e4; }
+.stk small { font-size: .65rem; font-weight: 800; color: var(--text); opacity: .6; }
+.stk.got { border: 3px solid #fff; background: radial-gradient(circle at 35% 30%, #fff, #ffe3f3); box-shadow: 0 4px 12px rgba(91,58,138,.2); color: inherit; cursor: pointer; animation: qin .4s ease-out; }
+.stk.next { border-color: var(--accent2); animation: pulse .9s ease-in-out infinite alternate; }
+.albumDaily { width: 100%; max-width: 420px; background: #fff; border-radius: 18px; padding: 12px; box-shadow: 0 4px 12px rgba(91,58,138,.15); display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: center; font-weight: 700; }
+.albumDaily .gems { width: 100%; text-align: center; font-size: 1.2rem; letter-spacing: 2px; word-break: break-all; }
+
+/* ---------- Silben-Brücke ---------- */
+.br-scene { display: flex; width: 100%; height: 150px; margin-top: 10px; align-items: flex-end; position: relative; }
+.br-bank { width: 64px; height: 90px; background: linear-gradient(#7ccf62, #4f9c3a 30%, #a5733c 31%); border-radius: 12px 12px 0 0; flex: none; position: relative; z-index: 2; }
+.br-water { flex: 1; height: 54px; background: repeating-linear-gradient(90deg, #4fb6ff 0 18px, #6cc4ff 18px 36px); border-radius: 0 0 10px 10px; position: relative; }
+.br-gap { position: absolute; left: -8px; right: -8px; top: -36px; display: flex; gap: 4px; }
+.br-slot { flex: 1; height: 46px; border: 3px dashed #a5733c; border-radius: 8px; background: rgba(255,255,255,.4); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 900; }
+.br-slot.full { border: 3px solid #7a4a1f; background: #e8c48c; animation: drop .25s ease-out; }
+.br-pet { position: absolute; bottom: 88px; left: 6px; z-index: 5; font-size: 2.6rem; line-height: 1; }
+.br-pet img { width: 48px; height: 48px; border-radius: 50%; border: 3px solid var(--accent2); object-fit: cover; }
+.br-goal { position: absolute; bottom: 86px; left: 0; right: 0; text-align: center; font-size: 3.4rem; line-height: 1; animation: hop .7s ease-in-out infinite alternate; }
+.br-hint { margin-top: 10px; font-weight: 800; opacity: .6; }
+.stone-syll { background: #efe2cf; box-shadow: 0 5px 0 #b3926a; text-transform: none; }
+
+/* ---------- Buchstaben-Spur ---------- */
+.tr-top { display: flex; align-items: center; gap: 14px; font-size: 3rem; font-weight: 900; }
+.tr-top small { font-size: 2rem; opacity: .6; margin-left: 6px; }
+.tr-wrap { flex: 1; width: 100%; min-height: 0; position: relative; }
+.tr-wrap canvas { position: absolute; inset: 0; touch-action: none; background: #fff; border-radius: 20px; box-shadow: 0 4px 14px rgba(91,58,138,.15); }
+
+/* ---------- Briefkasten ---------- */
+.mb-letter { width: 170px; height: 118px; margin-top: 8px; background: #fffdf5; border: 3px solid #e3cf9e; border-radius: 10px; position: relative; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 14px rgba(0,0,0,.12); background-image: linear-gradient(155deg, transparent 49%, #e3cf9e 50%, transparent 51%), linear-gradient(25deg, transparent 49%, #e3cf9e 50%, transparent 51%); }
+.mb-letter.arrive { animation: mbin .6s cubic-bezier(.2,1.4,.4,1); }
+.mb-letter.fly { transition: transform .8s ease-in, opacity .8s; opacity: 0; }
+@keyframes mbin { from { transform: translateX(-120vw) rotate(-20deg); } }
+.mb-stamp { position: absolute; top: 4px; right: 6px; font-size: 1.1rem; }
+.mb-pic { font-size: 3.8rem; background: #fffdf5; border-radius: 50%; padding: 2px 8px; }
+#mbSpeak { margin: 10px 0; }
+.mb-boxes { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: auto; margin-bottom: 14px; }
+.mbox { width: 80px; border: none; background: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; padding: 0; }
+.mbox .slot { width: 80px; height: 22px; background: #e8413c; border-radius: 40px 40px 0 0; position: relative; }
+.mbox .slot::after { content: ""; position: absolute; left: 18px; right: 18px; top: 9px; height: 6px; border-radius: 3px; background: #6b1512; }
+.mbox .lab { width: 80px; height: 78px; background: #ffcf3f; border: 4px solid #e8413c; border-top: none; display: flex; align-items: center; justify-content: center; font-size: 2.3rem; font-weight: 900; color: var(--text); border-radius: 0 0 8px 8px; }
+.mbox .lab small { font-size: 1.4rem; opacity: .6; margin-left: 2px; }
+.mbox .post { width: 10px; height: 34px; background: #7a5a3a; }
+.mbox.right .lab { background: var(--good); color: #fff; }
+
+/* ---------- Echo-Höhle ---------- */
+.ec-cave { width: 100%; height: 120px; margin-top: 6px; border-radius: 60px 60px 16px 16px; background: radial-gradient(ellipse at 50% 100%, #3a2a55 0%, #1d1430 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; }
+.ec-bat { font-size: 3rem; line-height: 1; animation: hop .5s ease-in-out infinite alternate; }
+.ec-bat.call { animation: ecall .35s ease-in-out infinite alternate; }
+@keyframes ecall { to { transform: scale(1.3) rotate(8deg); } }
+.ec-say { font-size: 1.4rem; font-weight: 900; letter-spacing: 4px; min-height: 1.5em; }
+.ec-carpet { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; max-width: 340px; margin-top: 12px; padding: 10px; border-radius: 14px; background: repeating-linear-gradient(45deg, #ffe3f3 0 12px, #f3e9ff 12px 24px); border: 4px solid #d6a2c8; }
+.ec-syl { border: none; border-radius: 12px; height: 62px; font-size: 1.8rem; font-weight: 900; color: var(--text); background: #fff; box-shadow: 0 4px 0 #d6c1f5; cursor: pointer; }
+.ec-syl:active { transform: translateY(3px); box-shadow: 0 1px 0 #d6c1f5; }
+.ec-syl.flashok { animation: yay .45s ease; background: #c9f2d9; }
+
+/* ---------- Wort-Angeln ---------- */
+.fi-top { display: flex; align-items: center; gap: 14px; margin-top: 4px; }
+.fi-pic { font-size: 4.2rem; line-height: 1; background: #fff; border-radius: 50%; width: 96px; height: 96px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(91,58,138,.18); }
+.fi-sea { flex: 1; width: 100%; min-height: 0; margin-top: 10px; position: relative; overflow: hidden; border-radius: 22px; background: linear-gradient(#8fd6ff, #2f7fe0); }
+.fish { position: absolute; left: 0; border: none; background: none; padding: 0; display: flex; align-items: center; gap: 0; cursor: pointer; }
+.fish .fb { font-size: 3rem; line-height: 1; display: inline-block; }
+.fish .fw { background: #fff; border-radius: 12px; padding: 4px 10px; font-size: 1.35rem; font-weight: 900; letter-spacing: 1px; color: var(--text); box-shadow: 0 3px 0 rgba(0,0,0,.15); }
+.fish.hint .fw { background: #fff34f; box-shadow: 0 0 0 5px #fff34f; }
+.fish.away .fw { background: #ffd6d6; }
+.fish.caught { animation: caught 1s ease-in forwards !important; }
+@keyframes caught { to { transform: translate(40vw, -60vh) rotate(-30deg) scale(.4); opacity: 0; } }
+@keyframes swimR { from { transform: translateX(-180px); } to { transform: translateX(min(560px, 100vw)); } }
+@keyframes swimL { from { transform: translateX(min(560px, 100vw)); } to { transform: translateX(-180px); } }
+
+/* ---------- Würfel-Blitz & Zahlentasten ---------- */
+.fl-box { width: 230px; height: 190px; margin: 12px 0; border-radius: 24px; background: #fff; box-shadow: 0 6px 16px rgba(91,58,138,.2); display: flex; align-items: center; justify-content: center; }
+.fl-box.lit { box-shadow: 0 0 0 6px #fff34f, 0 0 40px #fff34f; }
+.fl-cover { font-size: 4rem; opacity: .5; }
+.fl-nums { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 16px; max-width: 380px; }
+.fl-n { width: 62px; height: 62px; border: none; border-radius: 16px; font-size: 1.8rem; font-weight: 900; color: var(--text); background: #f3e9ff; box-shadow: 0 4px 0 #d6c1f5; cursor: pointer; }
+.fl-n:active { transform: translateY(3px); box-shadow: 0 1px 0 #d6c1f5; }
+
+/* ---------- Zahlenhaus ---------- */
+.nh-house { display: flex; flex-direction: column; align-items: center; margin-top: 6px; }
+.nh-roof { width: 230px; height: 70px; }
+.nh-body { width: 200px; border: 4px solid var(--text); border-top: none; background: #fff; }
+.nh-floor { display: grid; grid-template-columns: 1fr 1fr; border-top: 3px solid var(--text); }
+.nh-floor:first-child { border-top: none; }
+.nh-floor span { min-height: 58px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 900; line-height: 1; padding: 3px; }
+.nh-floor span + span { border-left: 3px solid var(--text); }
+.nh-floor.cur { background: #fff7c9; }
+.nh-floor .q.now { animation: hint 1s ease-in-out infinite; }
+.nh-floor .ok { color: var(--good); }
+.nh-pets { font-size: .8rem; letter-spacing: -1px; max-width: 90px; word-break: break-all; text-align: center; }
+
+/* ---------- Schiffe beladen ---------- */
+.sh-sea { width: 100%; height: 200px; position: relative; overflow: hidden; margin-top: 6px; border-radius: 0 0 20px 20px; background: linear-gradient(transparent 70%, #4fb6ff 70%); }
+.sh-waves { position: absolute; bottom: 0; left: 0; right: 0; text-align: center; font-size: 1.6rem; letter-spacing: 6px; opacity: .8; }
+.sh-boat { position: absolute; left: 50%; bottom: 34px; width: 200px; margin-left: -100px; display: flex; flex-direction: column; align-items: center; transform: translateY(var(--sink, 0)); transition: transform .6s ease; }
+.sh-sail { min-width: 76px; height: 62px; padding: 4px 8px; background: #fff; border: 3px solid var(--text); border-radius: 8px 30px 8px 8px; display: flex; align-items: center; justify-content: center; font-size: 2.3rem; font-weight: 900; }
+.sh-load { display: flex; flex-wrap: wrap-reverse; justify-content: center; width: 180px; min-height: 30px; font-size: 1.5rem; line-height: 1.1; }
+.sh-load span { animation: drop .25s ease-out; }
+.sh-hull { width: 190px; height: 34px; background: #a5733c; border-radius: 0 0 60px 60px; font-size: 0; border: 3px solid #7a4a1f; }
+.sh-boat.wobble { animation: wob .5s ease-in-out infinite alternate; }
+@keyframes wob { from { transform: translateY(var(--sink)) rotate(-5deg); } to { transform: translateY(var(--sink)) rotate(5deg); } }
+.sh-boat.tip { animation: tip 1.8s ease-in forwards; }
+@keyframes tip { 30% { transform: rotate(-25deg); } 100% { transform: rotate(60deg) translateY(160px); opacity: 0; } }
+.sh-boat.sail { transition: transform 2.2s ease-in; transform: translateX(120vw) !important; }
+.sh-pile { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; max-width: 360px; margin: 12px 0; }
+.sh-crate { width: 52px; height: 52px; border: none; border-radius: 12px; background: #fff; font-size: 1.9rem; box-shadow: 0 4px 0 #d6c1f5; cursor: pointer; }
+.sh-crate.used { visibility: hidden; }
+
+/* ---------- Zahlen-Weg ---------- */
+.np-task { font-size: 1.3rem; font-weight: 700; margin-top: 4px; }
+.np-wrap { flex: 1; width: 100%; min-height: 0; position: relative; margin: 8px 0 30px; }
+.np-wrap svg { position: absolute; inset: 0; pointer-events: none; }
+.np-stone { position: absolute; width: 54px; height: 54px; margin: -27px 0 0 -27px; border-radius: 50%; border: 3px solid #8a7b6a; background: radial-gradient(circle at 35% 30%, #f5f0e8, #c9bba8); font-size: 1.5rem; font-weight: 900; color: var(--text); cursor: pointer; z-index: 2; }
+.np-stone.on { background: radial-gradient(circle at 35% 30%, #fff6b0, #f0b53a); border-color: #a8700f; }
+.np-pet { position: absolute; z-index: 3; width: 40px; height: 40px; margin: -58px 0 0 -20px; font-size: 2rem; display: flex; align-items: center; justify-content: center; pointer-events: none; transition: left .35s ease, top .35s ease; opacity: 0; }
+.np-pet img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--accent2); object-fit: cover; }
+.np-reveal { position: absolute; left: 50%; top: 52%; transform: translate(-50%, -50%); font-size: 6rem; z-index: 4; animation: qin .6s cubic-bezier(.2,1.5,.4,1); pointer-events: none; }
+
+/* ---------- Insel-Krake ---------- */
+.bo-scene { position: relative; width: 100%; height: 230px; margin-top: 8px; border-radius: 24px; background: linear-gradient(#bfe8ff, #4fb6ff 60%, #2f7fe0); overflow: hidden; }
+.bo-kraken { position: absolute; left: 0; right: 0; text-align: center; top: 36px; font-size: 6.5rem; line-height: 1; animation: hop .9s ease-in-out infinite alternate; }
+.bo-kraken.happy { animation: dance .6s ease; }
+.bo-kraken.swim { animation: none; transition: transform 1.6s ease-in; transform: translateX(-110%); }
+.bo-ink { position: absolute; left: 0; right: 0; bottom: 10px; display: flex; justify-content: center; gap: 8px; font-size: 1.8rem; }
+.bo-ink span { transition: transform .5s, opacity .5s; }
+.bo-ink span.gone { transform: translateY(-80px) scale(1.6); opacity: 0; }
+.bo-chest { position: absolute; right: 16px; bottom: 50px; font-size: 2.4rem; }
+#boTalk { margin-top: 12px; text-align: center; max-width: 360px; }

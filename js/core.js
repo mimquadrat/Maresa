@@ -284,12 +284,64 @@
     $('riddleCount').textContent = '⭐ ' + r + ' Aufgaben';
   }
 
+  // ---------- Sammelalbum & Tages-Schatz ----------
+  const STICKERS = M.STICKERS = ['🦄', '🐬', '🦁', '🐼', '🦊', '🐢', '🦋', '🐙', '🦒', '🐧', '🦜', '🐨', '🦩', '🐳', '🦔', '🐞', '🦖', '🐿️', '🦚', '🐝', '🦭', '🐸', '🦦', '🐲'];
+  const STICKER_NAMES = ['Einhorn', 'Delfin', 'Löwe', 'Panda', 'Fuchs', 'Schildkröte', 'Schmetterling', 'Krake', 'Giraffe', 'Pinguin', 'Papagei', 'Koala', 'Flamingo', 'Wal', 'Igel', 'Marienkäfer', 'Dino', 'Eichhörnchen', 'Pfau', 'Biene', 'Robbe', 'Frosch', 'Otter', 'Drache'];
+  M.stickerOf = isl => [STICKERS[isl % STICKERS.length], STICKER_NAMES[isl % STICKERS.length]];
+  const day = (off = 0) => { const d = new Date(); d.setDate(d.getDate() + off); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  function dailyState() {
+    const last = store.get('maresaTagDatum', ''), streak = store.num('maresaTagSerie', 0);
+    return { doneToday: last === day(), streak: (last === day() || last === day(-1)) ? streak : 0, total: store.num('maresaTagAnzahl', 0) };
+  }
+  function showDaily() {
+    const d = dailyState(), b = $('dailyBtn'); if (!b) return;
+    b.classList.toggle('done', d.doneToday);
+    b.innerHTML = d.doneToday ? `✅ Tages-Schatz geschafft${d.streak > 1 ? ` · 🔥 ${d.streak} Tage` : ''}` : `🎁 Tages-Schatz${d.streak ? ` · 🔥 ${d.streak}` : ''}`;
+  }
+  M.showDaily = showDaily;
+  async function runDaily() {
+    if (dailyState().doneToday) { M.say('Den Tages-Schatz hast du heute schon geholt! Morgen gibt es einen neuen.'); M.toast('Morgen gibt\'s einen neuen Tages-Schatz! 🌙'); return; }
+    M.audio();
+    const L = Math.min(6, Math.floor(M.progress / N) + 2);
+    for (let k = 1; k <= 3; k++) await M.quiz(L, `🎁 Tages-Schatz ${k}/3`);
+    const prev = dailyState();
+    const streak = prev.streak + 1;
+    store.set('maresaTagDatum', day()); store.set('maresaTagSerie', streak); store.set('maresaTagAnzahl', prev.total + 1);
+    showDaily(); M.fanfare(); M.vibrate([80, 40, 160]); M.sparkle($('dailyBtn'), 24, ['💎', '⭐', '🎁', '✨']);
+    const msg = streak > 1 ? `Tages-Schatz! ${streak} Tage hintereinander!` : 'Tages-Schatz geholt! Morgen gibt es den nächsten.';
+    M.toast('💎 ' + msg + (streak > 1 ? ' 🔥' : ''), 3200); setTimeout(() => M.say(msg + ' ' + M.pick(M.PRAISE)), 1800);
+  }
+  function openAlbum() {
+    show('album');
+    const got = Math.floor(M.progress / N), slots = Math.max(12, Math.ceil((got + 1) / 6) * 6);
+    let h = '';
+    for (let i = 0; i < slots; i++) {
+      const [e, n] = M.stickerOf(i);
+      h += i < got ? `<button class="stk got" data-n="${n}">${e}<small>Insel ${i + 1}</small></button>` : `<div class="stk${i === got ? ' next' : ''}">❔<small>Insel ${i + 1}</small></div>`;
+    }
+    $('albumGrid').innerHTML = h;
+    $('albumGrid').querySelectorAll('.stk.got').forEach(b => b.onclick = () => { M.blip(); M.sparkle(b, 8); M.say(b.dataset.n); });
+    const d = dailyState();
+    $('albumDaily').innerHTML = `<div>💎 <b>${d.total}</b> ${d.total === 1 ? 'Tages-Schatz' : 'Tages-Schätze'}</div><div>🔥 <b>${d.streak}</b> ${d.streak === 1 ? 'Tag' : 'Tage'} am Stück</div>`
+      + `<div class="gems">${'💎'.repeat(Math.min(d.total, 60))}</div>`;
+    M.say(got ? `Du hast schon ${got} ${got === 1 ? 'Sticker' : 'Sticker'}! Für jede geschaffte Insel gibt es einen neuen.` : 'Hier kommen deine Sticker rein. Für jede geschaffte Insel gibt es einen!');
+  }
+
   // =====================================================================
   //  SPIELE & SCHATZKARTE
   // =====================================================================
   M.games = {};
   M.register = (id, g) => { M.games[id] = g; };
-  const ORDER = ['labyrinth', 'bubbles', 'memory', 'hop', 'catch', 'train', 'bakery', 'paint', 'pacman'];   // Mampf-Jagd als Schatz-Finale jeder Insel
+  // Jede Insel: 7 wechselnde Spiele + Insel-Boss (Krake) + Mampf-Jagd als Schatz-Finale.
+  // Die 17 Spiele rotieren, damit jede Insel anders ist, aber alle regelmäßig drankommen.
+  const POOL = ['labyrinth', 'bridge', 'flash', 'bubbles', 'mailbox', 'memory', 'ships', 'echo', 'hop', 'trace',
+    'numhouse', 'catch', 'fishing', 'train', 'numpath', 'bakery', 'paint'];
+  const PER = 7;
+  M.gameAt = i => {
+    const isl = Math.floor(i / 9), k = i % 9;
+    return k === 8 ? 'pacman' : k === 7 ? 'boss' : POOL[(isl * PER + k) % POOL.length];
+  };
+  const ORDER = Array.from({ length: 9 }, (_, k) => M.gameAt(k));
   const ISLANDS = [
     ['🦄 Einhorn-Wiese', '#ff8fc8'], ['🌴 Palmen-Strand', '#ffb84f'], ['🏰 Ritter-Burg', '#9c7cf0'],
     ['🌊 Glitzer-Meer', '#4fb6ff'], ['🍭 Zuckerland', '#ff6fa8'], ['🌋 Feuerberg', '#ff7a4f'],
@@ -327,7 +379,7 @@
     document.title = genitive(p.name) + ' Spielewelt';
     document.querySelectorAll('.mode').forEach(b => b.classList.toggle('on', b.dataset.m === M.mode));
     document.querySelectorAll('.animal').forEach(b => b.classList.toggle('on', b.dataset.a === M.animal));
-    showStats();
+    showStats(); if (M.showDaily) M.showDaily();
   }
   function playerStats(p) {
     const k = p.id === 'maresa' ? 'maresaStation' : 'sp_' + p.id + '_Station';
@@ -404,6 +456,11 @@
     });
   });
 
+  $('dailyBtn').onclick = runDaily;
+  $('albumBtn').onclick = () => { M.audio(); M.blip(); openAlbum(); };
+  $('albumBack').onclick = () => { show('start'); };
+  showDaily();
+
   // ---------- Karte (Schatzkarte) – immer genau EINE Insel, passt auf einen Bildschirm ----------
   const SEA = ['⛵', '🐙', '🐳', '🦈', '🐢', '🦑', '🏴‍☠️', '🐬'];
   const DECO = ['🌴', '🪨', '🌵', '🌺', '🍄', '🌴'];
@@ -452,7 +509,7 @@
       html += `<div class="deco" style="left:${w * fx}px;top:${y}px">${DECO[(j + viewIsland) % DECO.length]}</div>`);
     html += `<div class="deco sea" style="left:${w * .06}px;top:${h - 24}px">${SEA[(viewIsland * 3) % SEA.length]}</div><div class="deco sea" style="left:${w * .92}px;top:${108}px;animation-delay:.8s">${SEA[(viewIsland * 3 + 1) % SEA.length]}</div>`;
     pts.forEach((p, k) => {
-      const i = base + k, g = M.games[ORDER[k]];
+      const i = base + k, g = M.games[M.gameAt(i)];
       const cls = i < M.progress ? 'done' : i === M.progress ? 'current' : 'locked';
       if (k === N - 1) html += `<div class="xmark" style="left:${p.x}px;top:${p.y}px">✖</div>`;
       html += `<button class="station ${cls}" data-i="${i}" style="left:${p.x}px;top:${p.y}px">${g.icon}<small>${g.name}</small></button>`;
@@ -483,7 +540,7 @@
   let current = null;
   function startStation(i) {
     leaveGame();
-    const id = ORDER[i % N], g = M.games[id];
+    const id = M.gameAt(i), g = M.games[id];
     const round = Math.floor(i / N) + 1;
     current = { station: i, id, round };
     $('gTitle').textContent = g.icon + ' ' + g.name;
@@ -575,13 +632,14 @@
     $('headline').innerHTML = [...text].map((ch, i) => ch === ' ' ? ' ' : `<span style="animation-delay:${(i * 0.05).toFixed(2)}s;color:${colors[i % colors.length]}">${ch}</span>`).join('');
     const pr = pick(praises());
     $('praise').textContent = pr;
-    $('partyCount').textContent = g.icon + ' ' + g.name + ' geschafft!  ⭐ ' + store.num('maresaRaetsel') + ' Aufgaben gelöst';
+    const stk = islandDone ? M.stickerOf(Math.floor(s / N)) : null;
+    $('partyCount').textContent = stk ? `Neuer Sticker im Album: ${stk[0]} ${stk[1]}!` : g.icon + ' ' + g.name + ' geschafft!  ⭐ ' + store.num('maresaRaetsel') + ' Aufgaben gelöst';
     p.classList.add('active');
     const fl = document.createElement('div'); fl.className = 'flash'; p.appendChild(fl); setTimeout(() => fl.remove(), 600);
     const box = p.querySelector('.partybox'); box.classList.remove('shake'); void box.offsetWidth; box.classList.add('shake');
     M.vibrate([100, 50, 100, 50, 200, 100, 400]);
     M.fanfare();
-    setTimeout(() => M.say((islandDone ? 'Wahnsinn! Die ganze Insel geschafft! ' : M.name + ' hat es geschafft! ') + pr.replace(/[^\p{L}\p{N}\s!,'’]/gu, ''), 1), 2600);
+    setTimeout(() => M.say((islandDone ? 'Wahnsinn! Die ganze Insel geschafft! Du bekommst einen neuen Sticker: ' + stk[1] + '! ' : M.name + ' hat es geschafft! ') + pr.replace(/[^\p{L}\p{N}\s!,'’]/gu, ''), 1), 2600);
     sizeFx(); running = true; loop();
     confetti(islandDone ? 350 : 200); emojiRain(islandDone ? 100 : 60);
     let shots = 0;
