@@ -282,6 +282,9 @@
     const t = store.num('maresaSchaetze'), r = store.num('maresaRaetsel');
     $('treasureCount').textContent = '💰 ' + t + (t === 1 ? ' Schatz' : ' Schätze');
     $('riddleCount').textContent = '⭐ ' + r + ' Aufgaben';
+    // Insel-Level als Sterne (wie die Fahndungs-Sterne) – einer pro geschaffte Insel, max. 5
+    const isl = Math.floor(M.progress / 9), w = $('vcWanted');
+    if (w) w.innerHTML = Array.from({ length: 5 }, (_, i) => `<i class="${i < isl ? 'on' : ''}">★</i>`).join('');
   }
 
   // ---------- Sammelalbum & Tages-Schatz ----------
@@ -375,6 +378,7 @@
     M.PRAISE = ['Super!', 'Richtig!', 'Toll gemacht!', 'Bravo, ' + p.name + '!', 'Klasse!', 'Genau!', 'Spitze!', 'Wow!'];
     document.querySelectorAll('.avslot').forEach(s => s.innerHTML = M.avatarHTML(+s.dataset.size || 40));
     document.querySelectorAll('.pname').forEach(s => s.textContent = p.name);
+    const vn = $('vcName'); if (vn) vn.style.fontSize = Math.round(Math.min(84, 460 / Math.max(5, p.name.length))) + 'px';
     document.querySelectorAll('.pgen').forEach(s => s.textContent = genitive(p.name) + ' Spielewelt');
     document.title = genitive(p.name) + ' Spielewelt';
     document.querySelectorAll('.mode').forEach(b => b.classList.toggle('on', b.dataset.m === M.mode));
@@ -624,7 +628,7 @@
     const g = M.games[current.id];
     store.set('maresaSchaetze', store.num('maresaSchaetze') + 1); showStats();
     const islandDone = s === M.progress && s % N === N - 1;
-    if (s === M.progress) { M.progress++; store.set('maresaStation', M.progress); }
+    if (s === M.progress) { M.progress++; store.set('maresaStation', M.progress); showStats(); }
     const p = $('party');
     $('partyPet').textContent = M.animal === 'ME' ? '🌟' : M.animal;
     const text = islandDone ? '🏝️ INSEL GESCHAFFT! 🏝️' : '🎉 GESCHAFFT, ' + M.name.toUpperCase() + '! 🎉';

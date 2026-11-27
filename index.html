@@ -10,7 +10,10 @@
 <link rel="apple-touch-icon" href="img/maresa.jpg">
 <link rel="icon" href="img/maresa.jpg">
 <title>Maresas Spielewelt</title>
-<link rel="stylesheet" href="css/style.css?v=11">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&display=swap">
+<link rel="stylesheet" href="css/style.css?v=12">
 </head>
 <body>
 
@@ -36,11 +39,29 @@
   </div>
 </div>
 
-<div id="start" class="screen">
+<div id="start" class="screen vice">
+  <div class="vc-sky" aria-hidden="true">
+    <div class="vc-sun"></div>
+    <svg class="vc-palms" viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice">
+      <defs>
+        <g id="palm">
+          <path d="M0 300 C 4 230, 14 160, 34 96" stroke="#1a0b2e" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <path d="M34 96 C 10 70, -20 70, -44 92 C -18 78, 8 82, 34 96Z M34 96 C 20 60, 0 44, -22 40 C 0 52, 18 70, 34 96Z M34 96 C 44 56, 66 42, 92 44 C 68 56, 50 72, 34 96Z M34 96 C 62 74, 92 80, 110 104 C 86 90, 60 90, 34 96Z M34 96 C 40 72, 34 50, 28 30 C 44 48, 46 72, 34 96Z" fill="#1a0b2e"/>
+        </g>
+      </defs>
+      <use href="#palm" transform="translate(18 0) scale(1.05)"/>
+      <use href="#palm" transform="translate(70 70) scale(.72)"/>
+      <use href="#palm" transform="translate(372 0) scale(-1.1 1.05)"/>
+      <use href="#palm" transform="translate(318 90) scale(-.62 .66)"/>
+    </svg>
+    <div class="vc-sea"></div>
+  </div>
   <button class="btn swap" id="swapPlayer">👥 Spieler</button>
-  <div class="hero"><div class="crown">👑</div><span class="avslot" data-size="130"></span></div>
-  <h1 class="pgen">Maresas Spielewelt</h1>
-  <p>Hallo <span class="pname">Maresa</span>! 👋 Wer willst du heute sein?</p>
+  <div class="vc-cover"><span class="avslot" data-size="150"></span><div class="vc-shades">😎</div></div>
+  <h1 class="vc-logo"><span class="vc-name pname" id="vcName">Maresa</span><span class="vc-six">VI</span></h1>
+  <div class="vc-sub pgen">Maresas Spielewelt</div>
+  <div class="vc-wanted" id="vcWanted" aria-label="Insel-Level"></div>
+  <p class="vc-hi">Hallo <span class="pname">Maresa</span>! 👋 Wer willst du heute sein?</p>
   <div class="stats"><div id="treasureCount">💰 0 Schätze</div><div id="riddleCount">⭐ 0 Aufgaben</div></div>
   <div class="extras"><button class="xbtn" id="dailyBtn">🎁 Tages-Schatz</button><button class="xbtn" id="albumBtn">📒 Album</button></div>
   <div class="modes">
@@ -56,7 +77,7 @@
     <button class="animal" data-a="🐰">🐰<span>Hase</span></button>
     <button class="animal" data-a="ME"><span class="avslot" data-size="46"></span><span>Ich selbst!</span></button>
   </div>
-  <p style="font-size:.9rem; opacity:.75;">Tipp auf ein Tier, dann geht's zur Schatzkarte 🗺️</p>
+  <p class="vc-tip">Tipp auf ein Tier, dann geht's zur Schatzkarte 🗺️</p>
   <p class="lernstand">Lernstand 23.11.2026: Frohes Lernen 1 bis S. 38 (Buchstaben M I A O S U R T N) · Leseblatt &amp; Silbenteppich 1–5 · Richtig rechnen 1 bis S. 7</p>
 </div>
 
@@ -118,7 +139,7 @@
   </div>
 </div>
 
-<script src="js/core.js?v=11"></script>
+<script src="js/core.js?v=12"></script>
 <script src="js/games/labyrinth.js?v=11"></script>
 <script src="js/games/pacman.js?v=11"></script>
 <script src="js/games/bubbles.js?v=11"></script>

@@ -451,3 +451,50 @@ button { font-family: inherit; }
 .bo-ink span.gone { transform: translateY(-80px) scale(1.6); opacity: 0; }
 .bo-chest { position: absolute; right: 16px; bottom: 50px; font-size: 2.4rem; }
 #boTalk { margin-top: 12px; text-align: center; max-width: 360px; }
+
+/* ---------- Startseite im Vice-City-Look: „MARESA VI“ ---------- */
+#start.vice { justify-content: flex-start; gap: 10px; color: #fff; background: #1a0b2e; padding-top: max(18px, env(safe-area-inset-top)); touch-action: pan-y; }
+#start.vice > * { position: relative; z-index: 1; flex: none; }
+#start.vice > .vc-sky { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+  background: linear-gradient(180deg, #1b0b3a 0%, #4a1466 26%, #b3237a 48%, #ff5e7a 62%, #ff9f5a 72%, #ffd07a 78%, #2a1050 78.3%, #1a0b2e 100%); }
+.vc-sun { position: absolute; left: 50%; top: 52%; width: 300px; height: 300px; margin-left: -150px; border-radius: 50%;
+  background: linear-gradient(#fff0a8, #ffb347 45%, #ff4f8a 85%);
+  -webkit-mask: linear-gradient(#000 0 52%, transparent 52% 56%, #000 56% 64%, transparent 64% 69%, #000 69% 76%, transparent 76% 83%, #000 83% 88%, transparent 88%);
+          mask: linear-gradient(#000 0 52%, transparent 52% 56%, #000 56% 64%, transparent 64% 69%, #000 69% 76%, transparent 76% 83%, #000 83% 88%, transparent 88%);
+  box-shadow: 0 0 80px #ff7a9a; filter: drop-shadow(0 0 30px #ff6f91); }
+.vc-palms { position: absolute; left: 0; right: 0; bottom: 21%; width: 100%; height: 42%; }
+.vc-sea { position: absolute; left: 0; right: 0; bottom: 0; height: 22%;
+  background: repeating-linear-gradient(180deg, transparent 0 9px, rgba(255,120,170,.28) 9px 11px), linear-gradient(#3a1466, #12062a); }
+#start.vice .swap { z-index: 3; background: rgba(26,11,46,.7); border: 2px solid #ff4fa3; box-shadow: 0 0 12px rgba(255,79,163,.6); }
+
+.vc-cover { margin-top: 30px; width: 168px; height: 168px; border-radius: 22px; padding: 7px; transform: rotate(-4deg);
+  background: linear-gradient(135deg, #ffd23f, #ff4fa3 50%, #7a3cff); box-shadow: 0 10px 30px rgba(0,0,0,.45), 0 0 30px rgba(255,79,163,.55); }
+.vc-cover .av-photo, .vc-cover .av-emoji { width: 154px !important; height: 154px !important; border-radius: 16px; border: none; box-shadow: none; object-fit: cover; animation: none; display: flex; background: #2a1050; }
+.vc-shades { position: absolute; right: -18px; bottom: -14px; font-size: 3rem; transform: rotate(12deg); filter: drop-shadow(0 4px 6px rgba(0,0,0,.4)); animation: crownbob 1.6s ease-in-out infinite; }
+
+.vc-logo { margin: 6px 0 0; display: flex; align-items: center; justify-content: center; gap: 10px; max-width: 100%; line-height: .9; font-weight: 400;
+  font-family: Anton, "Bebas Neue", Impact, "Arial Narrow Bold", sans-serif; text-transform: uppercase; }
+.vc-name { font-size: 76px; letter-spacing: 1px; white-space: nowrap;
+  background: linear-gradient(180deg, #fff6c8 0%, #ffd23f 40%, #ff4fa3 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 4px 0 #3a0f55) drop-shadow(0 0 16px rgba(255,79,163,.7)); }
+.vc-six { flex: none; width: 1.55em; height: 1.55em; font-size: 46px; border-radius: .28em; display: flex; align-items: center; justify-content: center; color: #fff; letter-spacing: 2px;
+  background: linear-gradient(135deg, #ffb347 0%, #ff4fa3 45%, #7a3cff 100%); box-shadow: 0 5px 0 #3a0f55, 0 0 22px rgba(255,79,163,.8); transform: rotate(3deg); }
+.vc-sub { font-family: Anton, Impact, sans-serif; text-transform: uppercase; letter-spacing: 5px; font-size: .95rem; color: #ffd6ea; text-shadow: 0 2px 0 #3a0f55; }
+.vc-wanted { display: flex; gap: 4px; font-size: 1.6rem; line-height: 1; }
+.vc-wanted i { font-style: normal; color: transparent; -webkit-text-stroke: 2px #fff; opacity: .6; }
+.vc-wanted i.on { color: #fff; -webkit-text-stroke: 2px #1a0b2e; opacity: 1; text-shadow: 0 0 10px #ffd23f; }
+#start.vice .vc-hi { font-size: 1.1rem; font-weight: 700; text-shadow: 0 2px 6px rgba(0,0,0,.5); }
+
+#start.vice .stats div { background: rgba(26,11,46,.72); color: #fff; border: 2px solid rgba(255,255,255,.25); box-shadow: 0 4px 14px rgba(0,0,0,.3); }
+#start.vice #treasureCount { color: #6dff7a; font-family: Anton, Impact, sans-serif; font-weight: 400; letter-spacing: 1px; font-size: 1.05rem; text-shadow: 0 2px 0 #0b3a12; }
+#start.vice .mode { background: rgba(26,11,46,.72); color: #fff; border-color: rgba(255,255,255,.25); box-shadow: 0 4px 14px rgba(0,0,0,.3); }
+#start.vice .mode.on { border-color: #ff4fa3; background: #ff4fa3; box-shadow: 0 0 16px rgba(255,79,163,.8); }
+#start.vice .animal { background: rgba(26,11,46,.68); border-color: rgba(255,255,255,.18); box-shadow: 0 6px 16px rgba(0,0,0,.35); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+#start.vice .animal span { color: #fff; }
+#start.vice .animal.on, #start.vice .animal:active { border-color: #ffd23f; box-shadow: 0 0 18px rgba(255,210,63,.75); }
+#start.vice .vc-tip { font-size: .9rem; opacity: .85; text-shadow: 0 2px 4px rgba(0,0,0,.6); }
+#start.vice .lernstand { opacity: .55; padding-bottom: 14px; }
+#start.vice h1.vc-logo { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: #fff; font-size: inherit; }
+#start.vice > .swap { position: absolute; }
+#start.vice .vc-cover { margin-top: 44px; }
+#start.vice .lernstand { opacity: .8; text-shadow: 0 1px 3px rgba(0,0,0,.8); }
